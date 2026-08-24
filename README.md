@@ -4,7 +4,9 @@ A single-file, browser-based tool for adding CapCut-style Ken Burns zoom effects
 
 [🇻🇳 Tiếng Việt](README.vi.md)
 
-<!-- demo: assets/demo.gif -->
+![Zoom effect demo](assets/demo.gif)
+
+*Preview of the zoom effect (using a placeholder test clip) — click a point, and the segment zooms smoothly in and back out.*
 
 ## Why this exists
 

@@ -4,7 +4,9 @@ Công cụ chỉnh video zoom in/out kiểu Ken Burns (giống CapCut) chạy g�
 
 [🇬🇧 English](README.md)
 
-<!-- demo: assets/demo.gif -->
+![Demo hiệu ứng zoom](assets/demo.gif)
+
+*Xem trước hiệu ứng zoom (dùng clip test mẫu) — click một điểm, đoạn zoom sẽ mượt mà zoom vào rồi zoom ra.*
 
 ## Vì sao có tool này
 
