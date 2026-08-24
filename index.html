@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Zoom Timeline Editor</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #14161a;
+    --panel: #1e2126;
+    --panel-2: #262a31;
+    --border: #33383f;
+    --text: #e8e9ec;
+    --muted: #8a919c;
+    --accent: #4da3ff;
+    --accent-2: #ff6b6b;
+    --seg: #ffd166;
+    --seg-fill: rgba(255, 209, 102, 0.28);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; min-height: 100%;
+    background: var(--bg); color: var(--text);
+    font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  body {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 16px; padding: 20px;
+  }
+  .topbar {
+    width: 100%; max-width: 1100px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .topbar h1 { font-size: 15px; font-weight: 600; margin: 0; color: var(--muted); }
+  .topbar .actions { display: flex; gap: 8px; align-items: center; }
+  button {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer;
+  }
+  button:hover { background: #2f343c; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #08131f; font-weight: 600; }
+  button.danger { color: var(--accent-2); }
+  button.lang { min-width: 44px; font-weight: 700; }
+  button.rec { border-color: #7a3a3a; color: #ffb4b4; }
+  button.rec.recording { background: var(--accent-2); border-color: var(--accent-2); color: #2a0000; font-weight: 700; }
+
+  .stage {
+    position: relative;
+    width: 100%; max-width: 1100px;
+    aspect-ratio: var(--ar, 16 / 9);
+    flex-shrink: 0;
+    min-height: 160px;
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .stage.drag-over { outline: 2px dashed var(--accent); outline-offset: -2px; }
+  canvas { display: block; width: 100%; height: 100%; }
+  canvas.focus-cursor {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"><circle cx="11" cy="11" r="7" fill="none" stroke="black" stroke-width="4"/><line x1="16" y1="16" x2="23" y2="23" stroke="black" stroke-width="4" stroke-linecap="round"/><circle cx="11" cy="11" r="7" fill="none" stroke="white" stroke-width="2"/><line x1="16" y1="16" x2="23" y2="23" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>') 11 11, crosshair;
+  }
+  .recDot {
+    position: absolute; top: 12px; left: 12px; z-index: 5;
+    display: none; align-items: center; gap: 8px;
+    background: rgba(0,0,0,0.6); border-radius: 20px; padding: 6px 12px;
+    font-size: 12px; font-variant-numeric: tabular-nums;
+  }
+  body.is-recording .recDot { display: flex; }
+  .recDot i {
+    width: 9px; height: 9px; border-radius: 50%; background: var(--accent-2);
+    animation: blink 1s steps(2, start) infinite;
+  }
+  @keyframes blink { to { opacity: 0.15; } }
+
+  .dropHint {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 10px; color: var(--muted); text-align: center; padding: 20px;
+  }
+
+  .panel {
+    width: 100%; max-width: 1100px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .row.between { justify-content: space-between; }
+  .time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; }
+
+  .timeline {
+    position: relative; height: 46px; background: var(--panel-2);
+    border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+  }
+  .playhead {
+    position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent);
+    pointer-events: none; z-index: 3;
+  }
+  .segment { position: absolute; top: 6px; bottom: 6px; z-index: 2; }
+  .seg-fill {
+    position: absolute; left: 6px; right: 6px; top: 0; bottom: 0;
+    background: var(--seg-fill); border: 1px solid var(--seg); border-radius: 4px;
+    cursor: grab;
+  }
+  .segment.selected .seg-fill { background: rgba(77, 163, 255, 0.35); border-color: var(--accent); }
+  .seg-handle {
+    position: absolute; top: 0; bottom: 0; width: 10px;
+    background: var(--seg); border-radius: 3px; cursor: ew-resize; z-index: 3;
+  }
+  .segment.selected .seg-handle { background: var(--accent); }
+  .seg-handle.left { left: 0; }
+  .seg-handle.right { right: 0; }
+
+  .kfControls { display: flex; align-items: center; gap: 10px; }
+  .kfControls label { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  input[type=range] { width: 150px; }
+  .hint { color: var(--muted); font-size: 12px; }
+  .badge {
+    font-size: 11px; color: var(--muted); background: var(--panel-2);
+    border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px;
+  }
+  a.saveLink {
+    display: none; color: var(--accent); font-size: 13px; text-decoration: none;
+    border: 1px solid var(--accent); border-radius: 6px; padding: 6px 12px;
+  }
+  a.saveLink.show { display: inline-block; }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <h1 data-i18n="title">Zoom Timeline Editor</h1>
+    <div class="actions">
+      <button class="lang" id="langBtn">VI</button>
+      <button class="rec" id="recordBtn" disabled>● Record</button>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <canvas id="canvas"></canvas>
+    <div class="recDot"><i></i><span id="recTime">0.0s</span></div>
+    <div class="dropHint" id="dropHint">
+      <div data-i18n="dropHint1">Drag &amp; drop a video here, or</div>
+      <button class="primary" id="pickBtn" data-i18n="pick">Choose video…</button>
+      <div class="hint" data-i18n="dropNote">The video is read directly from your device — nothing is uploaded.</div>
+    </div>
+  </div>
+  <input type="file" id="fileInput" accept="video/*" style="display:none">
+
+  <div class="panel">
+    <div class="row between">
+      <div class="row">
+        <button id="playBtn" disabled data-i18n="play">▶ Play</button>
+        <span class="time" id="timeLabel">0.00 / 0.00s</span>
+        <a class="saveLink" id="saveLink" download data-i18n="save">⤓ Save recording</a>
+      </div>
+      <div class="row">
+        <span class="badge" id="resBadge">—</span>
+        <button id="addSegBtn" disabled data-i18n="addSeg">+ Add zoom segment at playhead</button>
+        <button id="delSegBtn" class="danger" disabled data-i18n="delSeg">Delete selected segment</button>
+      </div>
+    </div>
+
+    <div class="timeline" id="timeline"><div class="playhead" id="playhead"></div></div>
+
+    <div class="row between">
+      <div class="kfControls">
+        <label data-i18n="selectedLabel">Selected segment:</label>
+        <span class="badge" id="selBadge" data-i18n="noneSelected">none selected</span>
+      </div>
+      <div class="kfControls">
+        <label for="zoomRange" data-i18n="zoomLabel">Zoom ratio</label>
+        <input type="range" id="zoomRange" min="1" max="6" step="0.05" value="1.8" disabled>
+        <span class="time" id="zoomLabel2"></span>
+      </div>
+    </div>
+    <div class="row between">
+      <div class="kfControls">
+        <label for="zoomInRange" data-i18n="zoomInLabel">Zoom-in speed</label>
+        <input type="range" id="zoomInRange" min="0.1" max="3" step="0.1" value="0.6" disabled>
+        <span class="time" id="zoomInLabel2"></span>
+      </div>
+      <div class="kfControls">
+        <label for="zoomOutRange" data-i18n="zoomOutLabel">Zoom-out speed</label>
+        <input type="range" id="zoomOutRange" min="0.1" max="3" step="0.1" value="0.6" disabled>
+        <span class="time" id="zoomOutLabel2"></span>
+      </div>
+    </div>
+    <div class="hint" data-i18n="hint">
+      Click a zoom segment on the timeline to select it, then click/drag on the frame to set the zoom point.
+      Drag a segment's edges to change its start/end, or drag its middle to move it — playback keeps running
+      while you adjust. Outside any segment the video always stays unzoomed.
+      Record captures exactly the preview frame at the video's native resolution: it rewinds, plays, and stops on its own.
+    </div>
+  </div>
+
+<script>
+(() => {
+  const STR = {
+    en: {
+      title: 'Zoom Timeline Editor',
+      dropHint1: 'Drag & drop a video here, or',
+      pick: 'Choose video…',
+      dropNote: 'The video is read directly from your device — nothing is uploaded.',
+      play: '▶ Play', pause: '⏸ Pause',
+      startRec: '● Record', stopRec: '■ Stop',
+      save: '⤓ Save recording',
+      addSeg: '+ Add zoom segment at playhead',
+      delSeg: 'Delete selected segment',
+      selectedLabel: 'Selected segment:',
+      noneSelected: 'none selected',
+      zoomLabel: 'Zoom ratio',
+      zoomInLabel: 'Zoom-in speed',
+      zoomOutLabel: 'Zoom-out speed',
+      hint: `Click a zoom segment on the timeline to select it, then click/drag on the frame to set the zoom point.
+      Drag a segment's edges to change its start/end, or drag its middle to move it — playback keeps running
+      while you adjust. Outside any segment the video always stays unzoomed.
+      Record captures exactly the preview frame at the video's native resolution: it rewinds, plays, and stops on its own.`,
+      lang: 'VI',
+      canvasBadge: (vw, vh) => `Output: ${vw}×${vh} (source resolution)`,
+      segBadge: (s) => `start ${s.start.toFixed(2)}s → end ${s.end.toFixed(2)}s`,
+      recFail: 'Recording is not supported in this browser.',
+      lowFpsWarn: (fps) => `Only ~${fps} frames per second were captured, so this take will stutter. Keep this tab visible and in the foreground while recording — browsers suspend drawing in background tabs.`,
+    },
+    vi: {
+      title: 'Zoom Timeline Editor',
+      dropHint1: 'Kéo-thả video vào đây, hoặc',
+      pick: 'Chọn video…',
+      dropNote: 'Video được đọc trực tiếp từ máy, không upload lên đâu cả.',
+      play: '▶ Phát', pause: '⏸ Tạm dừng',
+      startRec: '● Quay', stopRec: '■ Dừng quay',
+      save: '⤓ Lưu bản quay',
+      addSeg: '+ Thêm đoạn zoom tại playhead',
+      delSeg: 'Xoá đoạn đang chọn',
+      selectedLabel: 'Đoạn đang chọn:',
+      noneSelected: 'chưa chọn',
+      zoomLabel: 'Tỷ lệ zoom',
+      zoomInLabel: 'Tốc độ zoom vào',
+      zoomOutLabel: 'Tốc độ zoom ra',
+      hint: `Click một đoạn zoom trên timeline để chọn, rồi click/kéo trên khung hình để đặt điểm zoom.
+      Kéo hai đầu đoạn để đổi thời điểm bắt đầu/kết thúc, kéo phần giữa để di chuyển cả đoạn — video vẫn
+      chạy bình thường trong lúc bạn chỉnh. Ngoài các đoạn đã đặt, video luôn giữ nguyên không zoom.
+      Nút Quay ghi đúng khung preview ở độ phân giải gốc của video: tự tua về đầu, tự phát và tự dừng.`,
+      lang: 'EN',
+      canvasBadge: (vw, vh) => `Đầu ra: ${vw}×${vh} (đúng độ phân giải gốc)`,
+      segBadge: (s) => `bắt đầu ${s.start.toFixed(2)}s → kết thúc ${s.end.toFixed(2)}s`,
+      recFail: 'Trình duyệt này không hỗ trợ ghi hình.',
+      lowFpsWarn: (fps) => `Chỉ ghi được khoảng ${fps} hình/giây nên bản này sẽ bị khựng. Giữ tab hiển thị ở phía trước trong lúc quay — trình duyệt ngưng vẽ khi tab chạy nền.`,
+    },
+  };
+  let lang = 'en';
+  const t = (k) => STR[lang][k];
+
+  const stage = document.getElementById('stage');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const dropHint = document.getElementById('dropHint');
+  const fileInput = document.getElementById('fileInput');
+  const pickBtn = document.getElementById('pickBtn');
+  const playBtn = document.getElementById('playBtn');
+  const timeLabel = document.getElementById('timeLabel');
+  const resBadge = document.getElementById('resBadge');
+  const addSegBtn = document.getElementById('addSegBtn');
+  const delSegBtn = document.getElementById('delSegBtn');
+  const timeline = document.getElementById('timeline');
+  const playhead = document.getElementById('playhead');
+  const zoomRange = document.getElementById('zoomRange');
+  const zoomLabel2 = document.getElementById('zoomLabel2');
+  const zoomInRange = document.getElementById('zoomInRange');
+  const zoomInLabel2 = document.getElementById('zoomInLabel2');
+  const zoomOutRange = document.getElementById('zoomOutRange');
+  const zoomOutLabel2 = document.getElementById('zoomOutLabel2');
+  const selBadge = document.getElementById('selBadge');
+  const langBtn = document.getElementById('langBtn');
+  const recordBtn = document.getElementById('recordBtn');
+  const recTime = document.getElementById('recTime');
+  const saveLink = document.getElementById('saveLink');
+
+  const video = document.createElement('video');
+  video.playsInline = true;
+
+  // offscreen canvas used for recording at the video's native resolution,
+  // so output quality never depends on the window size
+  const recCanvas = document.createElement('canvas');
+  const recCtx = recCanvas.getContext('2d');
+
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+
+  let segments = [];
+  let selectedId = null;
+  let nextId = 1;
+  let lastCrop = null;
+  let rafId = null;
+  let dragMode = null;
+  let scrubbing = false;
+  let recorder = null;
+  let recChunks = [];
+  let recStartedAt = 0;
+  let lastObjectUrl = null;
+  let recFrameCount = 0;
+
+  // C2-continuous easing: zero velocity AND zero acceleration at both ends,
+  // which removes the small "kick" you get at the start/end of a cubic ease.
+  function smootherstep(p) { return p * p * p * (p * (p * 6 - 15) + 10); }
+  function lerp(a, b, p) { return a + (b - a) * p; }
+  function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+
+  function findActiveSegment(time) {
+    for (const s of segments) if (time >= s.start && time <= s.end) return s;
+    return null;
+  }
+
+  function interpolate(time) {
+    const s = findActiveSegment(time);
+    if (!s) return { zoom: 1, focusX: 0.5, focusY: 0.5 };
+    const len = s.end - s.start;
+    const totalRamp = s.zoomInDur + s.zoomOutDur;
+    let rampIn, rampOut;
+    if (totalRamp > len) {
+      rampIn = totalRamp > 0 ? (s.zoomInDur / totalRamp) * len : len / 2;
+      rampOut = len - rampIn;
+    } else {
+      rampIn = s.zoomInDur;
+      rampOut = s.zoomOutDur;
+    }
+    // zoom is interpolated geometrically (Math.pow), not linearly: perceived zoom
+    // speed is multiplicative, so this is what actually reads as "constant speed".
+    if (time < s.start + rampIn) {
+      const p = rampIn > 0 ? smootherstep((time - s.start) / rampIn) : 1;
+      return { zoom: Math.pow(s.zoom, p), focusX: s.focusX, focusY: s.focusY };
+    }
+    if (time > s.end - rampOut) {
+      const p = rampOut > 0 ? smootherstep((time - (s.end - rampOut)) / rampOut) : 1;
+      return { zoom: Math.pow(s.zoom, 1 - p), focusX: s.focusX, focusY: s.focusY };
+    }
+    return { zoom: s.zoom, focusX: s.focusX, focusY: s.focusY };
+  }
+
+  function computeCrop() {
+    const vw = video.videoWidth, vh = video.videoHeight;
+    const { zoom, focusX, focusY } = interpolate(video.currentTime);
+    const z = Math.max(1, zoom);
+    const cropW = vw / z, cropH = vh / z;
+    const centerX = clamp(focusX * vw, cropW / 2, Math.max(cropW / 2, vw - cropW / 2));
+    const centerY = clamp(focusY * vh, cropH / 2, Math.max(cropH / 2, vh - cropH / 2));
+    return { sx: centerX - cropW / 2, sy: centerY - cropH / 2, cropW, cropH };
+  }
+
+  function draw() {
+    if (!video.videoWidth) return;
+    const crop = computeCrop();
+    lastCrop = crop;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(video, crop.sx, crop.sy, crop.cropW, crop.cropH, 0, 0, canvas.width, canvas.height);
+
+    if (recorder && recorder.state === 'recording') {
+      recCtx.imageSmoothingEnabled = true;
+      recCtx.imageSmoothingQuality = 'high';
+      recCtx.drawImage(video, crop.sx, crop.sy, crop.cropW, crop.cropH, 0, 0, recCanvas.width, recCanvas.height);
+      recFrameCount++;
+      recTime.textContent = ((performance.now() - recStartedAt) / 1000).toFixed(1) + 's';
+    }
+
+    // focus crosshair, preview only — never drawn into the recording
+    const sel = segments.find(s => s.id === selectedId);
+    if (sel && video.currentTime >= sel.start && video.currentTime <= sel.end) {
+      const cx = canvas.width / 2, cy = canvas.height / 2;
+      ctx.strokeStyle = 'rgba(77,163,255,0.9)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx - 14, cy); ctx.lineTo(cx + 14, cy);
+      ctx.moveTo(cx, cy - 14); ctx.lineTo(cx, cy + 14);
+      ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, cy, 10, 0, Math.PI * 2); ctx.stroke();
+    }
+  }
+
+  // Drive rendering from requestAnimationFrame (display refresh, ~60Hz) rather than
+  // from video frame callbacks (~24-30Hz). The zoom animation is then interpolated at
+  // screen rate instead of source-frame rate, which is what removes the stutter.
+  function loop() {
+    draw();
+    rafId = requestAnimationFrame(loop);
+  }
+  function startLoop() { if (rafId === null) rafId = requestAnimationFrame(loop); }
+  function stopLoop() {
+    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+    draw();
+  }
+
+  function loadFile(file) {
+    if (!file || !file.type.startsWith('video/')) return;
+    if (lastObjectUrl) URL.revokeObjectURL(lastObjectUrl);
+    lastObjectUrl = URL.createObjectURL(file);
+    video.src = lastObjectUrl;
+    dropHint.style.display = 'none';
+  }
+
+  function resizeCanvasToStage() {
+    const rect = stage.getBoundingClientRect();
+    const w = Math.max(1, Math.round(rect.width * dpr));
+    const h = Math.max(1, Math.round(rect.height * dpr));
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w; canvas.height = h;
+      draw();
+    }
+  }
+  new ResizeObserver(resizeCanvasToStage).observe(stage);
+
+  video.addEventListener('loadedmetadata', () => {
+    const vw = video.videoWidth, vh = video.videoHeight;
+    stage.style.setProperty('--ar', vw + ' / ' + vh);
+    recCanvas.width = vw; recCanvas.height = vh;
+    resBadge.textContent = t('canvasBadge')(vw, vh);
+    resizeCanvasToStage();
+
+    segments = [];
+    selectedId = null;
+    playBtn.disabled = false;
+    addSegBtn.disabled = false;
+    recordBtn.disabled = false;
+    updateTimeline();
+    updateSelectionUI();
+    draw();
+  });
+
+  video.addEventListener('play', () => { playBtn.textContent = t('pause'); startLoop(); });
+  video.addEventListener('pause', () => { playBtn.textContent = t('play'); stopLoop(); });
+  video.addEventListener('ended', () => {
+    playBtn.textContent = t('play');
+    stopLoop();
+    if (recorder && recorder.state === 'recording') stopRecording();
+  });
+  video.addEventListener('seeked', draw);
+  video.addEventListener('timeupdate', () => {
+    timeLabel.textContent = `${video.currentTime.toFixed(2)} / ${(video.duration || 0).toFixed(2)}s`;
+    updatePlayheadPosition();
+  });
+
+  playBtn.addEventListener('click', () => { if (video.paused) video.play(); else video.pause(); });
+  pickBtn.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', (e) => loadFile(e.target.files[0]));
+
+  ['dragover', 'dragenter'].forEach(evt => stage.addEventListener(evt, (e) => {
+    e.preventDefault(); stage.classList.add('drag-over');
+  }));
+  ['dragleave', 'drop'].forEach(evt => stage.addEventListener(evt, (e) => {
+    e.preventDefault(); stage.classList.remove('drag-over');
+  }));
+  stage.addEventListener('drop', (e) => loadFile(e.dataTransfer.files && e.dataTransfer.files[0]));
+
+  // ---- Timeline ----
+  function updateTimeline() {
+    timeline.querySelectorAll('.segment').forEach(el => el.remove());
+    const dur = video.duration || 0;
+    segments.forEach(s => {
+      const el = document.createElement('div');
+      el.className = 'segment' + (s.id === selectedId ? ' selected' : '');
+      el.style.left = (dur ? (s.start / dur) * 100 : 0) + '%';
+      el.style.width = (dur ? ((s.end - s.start) / dur) * 100 : 0) + '%';
+      el.dataset.id = s.id;
+
+      const fill = document.createElement('div');
+      fill.className = 'seg-fill';
+      fill.addEventListener('pointerdown', (e) => {
+        e.stopPropagation(); selectSegment(s.id); beginDrag('move', s, e);
+      });
+
+      const leftH = document.createElement('div');
+      leftH.className = 'seg-handle left';
+      leftH.addEventListener('pointerdown', (e) => {
+        e.stopPropagation(); selectSegment(s.id); beginDrag('resize-start', s, e);
+      });
+
+      const rightH = document.createElement('div');
+      rightH.className = 'seg-handle right';
+      rightH.addEventListener('pointerdown', (e) => {
+        e.stopPropagation(); selectSegment(s.id); beginDrag('resize-end', s, e);
+      });
+
+      el.append(fill, leftH, rightH);
+      timeline.appendChild(el);
+    });
+    updatePlayheadPosition();
+  }
+
+  function updatePlayheadPosition() {
+    const dur = video.duration || 0;
+    playhead.style.left = (dur ? (video.currentTime / dur) * 100 : 0) + '%';
+  }
+
+  function beginDrag(kind, seg, e) {
+    dragMode = { kind, id: seg.id, startClientX: e.clientX, origStart: seg.start, origEnd: seg.end };
+    window.addEventListener('pointermove', onDragMove);
+    window.addEventListener('pointerup', onDragEnd);
+  }
+  function onDragMove(e) {
+    if (!dragMode) return;
+    const s = segments.find(x => x.id === dragMode.id);
+    if (!s) return;
+    const rect = timeline.getBoundingClientRect();
+    const dur = video.duration || 0;
+    const deltaTime = ((e.clientX - dragMode.startClientX) / rect.width) * dur;
+    const MIN_LEN = 0.1;
+    if (dragMode.kind === 'move') {
+      const len = dragMode.origEnd - dragMode.origStart;
+      const newStart = clamp(dragMode.origStart + deltaTime, 0, Math.max(0, dur - len));
+      s.start = newStart; s.end = newStart + len;
+    } else if (dragMode.kind === 'resize-start') {
+      s.start = clamp(dragMode.origStart + deltaTime, 0, dragMode.origEnd - MIN_LEN);
+    } else if (dragMode.kind === 'resize-end') {
+      s.end = clamp(dragMode.origEnd + deltaTime, dragMode.origStart + MIN_LEN, dur);
+    }
+    updateTimeline();
+    updateSelectionUI();
+    if (video.paused) draw();
+  }
+  function onDragEnd() {
+    dragMode = null;
+    window.removeEventListener('pointermove', onDragMove);
+    window.removeEventListener('pointerup', onDragEnd);
+    const s = segments.find(x => x.id === selectedId);
+    if (s) seekToPeak(s);
+  }
+
+  timeline.addEventListener('pointerdown', (e) => {
+    if (e.target !== timeline && e.target !== playhead) return;
+    scrubbing = true;
+    seekFromClientX(e.clientX);
+  });
+  window.addEventListener('pointermove', (e) => { if (scrubbing) seekFromClientX(e.clientX); });
+  window.addEventListener('pointerup', () => { scrubbing = false; });
+
+  function seekFromClientX(clientX) {
+    const rect = timeline.getBoundingClientRect();
+    const pct = clamp((clientX - rect.left) / rect.width, 0, 1);
+    video.currentTime = pct * (video.duration || 0);
+  }
+
+  // Only reposition the playhead while paused. If the video is playing, editing a
+  // segment must never interrupt or rewind playback.
+  function seekToPeak(s) {
+    if (!video.paused) return;
+    const len = s.end - s.start;
+    const totalRamp = s.zoomInDur + s.zoomOutDur;
+    const rampIn = totalRamp > len ? (s.zoomInDur / (totalRamp || 1)) * len : s.zoomInDur;
+    video.currentTime = clamp(s.start + rampIn, s.start, s.end);
+  }
+
+  function selectSegment(id) {
+    selectedId = id;
+    const s = segments.find(x => x.id === id);
+    if (!s) return;
+    seekToPeak(s);
+    zoomRange.value = s.zoom;
+    zoomInRange.value = s.zoomInDur;
+    zoomOutRange.value = s.zoomOutDur;
+    [zoomRange, zoomInRange, zoomOutRange].forEach(el => el.disabled = false);
+    delSegBtn.disabled = false;
+    canvas.classList.add('focus-cursor');
+    updateTimeline();
+    updateSelectionUI();
+    if (video.paused) draw();
+  }
+
+  function updateSelectionUI() {
+    const s = segments.find(x => x.id === selectedId);
+    if (!s) {
+      selBadge.textContent = t('noneSelected');
+      zoomLabel2.textContent = zoomInLabel2.textContent = zoomOutLabel2.textContent = '';
+      return;
+    }
+    selBadge.textContent = t('segBadge')(s);
+    zoomLabel2.textContent = s.zoom.toFixed(2) + '×';
+    zoomInLabel2.textContent = s.zoomInDur.toFixed(1) + 's';
+    zoomOutLabel2.textContent = s.zoomOutDur.toFixed(1) + 's';
+  }
+
+  addSegBtn.addEventListener('click', () => {
+    const dur = video.duration || 0;
+    const start = video.currentTime;
+    const len = Math.min(2, Math.max(0.5, dur * 0.2));
+    const end = clamp(start + len, start + 0.5, dur);
+    const s = { id: nextId++, start, end, zoom: 1.8, focusX: 0.5, focusY: 0.5, zoomInDur: 0.6, zoomOutDur: 0.6 };
+    segments.push(s);
+    segments.sort((a, b) => a.start - b.start);
+    updateTimeline();
+    selectSegment(s.id);
+  });
+
+  delSegBtn.addEventListener('click', () => {
+    if (selectedId === null) return;
+    segments = segments.filter(s => s.id !== selectedId);
+    selectedId = null;
+    [zoomRange, zoomInRange, zoomOutRange].forEach(el => el.disabled = true);
+    delSegBtn.disabled = true;
+    canvas.classList.remove('focus-cursor');
+    updateTimeline();
+    updateSelectionUI();
+    draw();
+  });
+
+  function bindSlider(el, prop, labelEl, fmt) {
+    el.addEventListener('input', () => {
+      const s = segments.find(x => x.id === selectedId);
+      if (!s) return;
+      s[prop] = parseFloat(el.value);
+      labelEl.textContent = fmt(s[prop]);
+      if (video.paused) draw();
+    });
+  }
+  bindSlider(zoomRange, 'zoom', zoomLabel2, v => v.toFixed(2) + '×');
+  bindSlider(zoomInRange, 'zoomInDur', zoomInLabel2, v => v.toFixed(1) + 's');
+  bindSlider(zoomOutRange, 'zoomOutDur', zoomOutLabel2, v => v.toFixed(1) + 's');
+
+  // click/drag on the frame sets the zoom point of the selected segment
+  let paintingFocus = false;
+  function setFocusFromCanvasEvent(e) {
+    const s = segments.find(x => x.id === selectedId);
+    if (!s || !lastCrop || !video.videoWidth) return;
+    const rect = canvas.getBoundingClientRect();
+    const vx = lastCrop.sx + ((e.clientX - rect.left) / rect.width) * lastCrop.cropW;
+    const vy = lastCrop.sy + ((e.clientY - rect.top) / rect.height) * lastCrop.cropH;
+    s.focusX = clamp(vx / video.videoWidth, 0, 1);
+    s.focusY = clamp(vy / video.videoHeight, 0, 1);
+    if (video.paused) draw();
+  }
+  canvas.addEventListener('pointerdown', (e) => {
+    if (selectedId === null) return;
+    paintingFocus = true;
+    setFocusFromCanvasEvent(e);
+  });
+  canvas.addEventListener('pointermove', (e) => { if (paintingFocus) setFocusFromCanvasEvent(e); });
+  window.addEventListener('pointerup', () => { paintingFocus = false; });
+
+  // ---- Recording (captures the canvas directly, so the frame is exact) ----
+  function pickMimeType() {
+    // H.264 + AAC first: an MP4 whose audio is Opus is valid but QuickTime and
+    // Final Cut cannot decode it, so ask for AAC explicitly before falling back.
+    const candidates = [
+      'video/mp4;codecs=avc1.640028,mp4a.40.2',
+      'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+      'video/mp4;codecs=avc1.640028',
+      'video/mp4',
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm',
+    ];
+    for (const m of candidates) {
+      if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
+    }
+    return '';
+  }
+
+  function startRecording() {
+    if (!window.MediaRecorder || !recCanvas.captureStream) { alert(t('recFail')); return; }
+    const mimeType = pickMimeType();
+    const stream = recCanvas.captureStream(60);
+
+    // carry the original audio over when the browser allows it
+    try {
+      const cap = video.captureStream || video.mozCaptureStream || video.webkitCaptureStream;
+      if (cap) cap.call(video).getAudioTracks().forEach(tr => stream.addTrack(tr));
+    } catch (_) { /* video keeps playing without recorded audio */ }
+
+    recChunks = [];
+    recorder = new MediaRecorder(stream, mimeType ? { mimeType, videoBitsPerSecond: 12e6 } : undefined);
+    recorder.ondataavailable = (e) => { if (e.data && e.data.size) recChunks.push(e.data); };
+    recorder.onstop = () => {
+      const type = recorder.mimeType || mimeType || 'video/webm';
+      const blob = new Blob(recChunks, { type });
+      const ext = type.includes('mp4') ? 'mp4' : 'webm';
+      saveLink.href = URL.createObjectURL(blob);
+      saveLink.download = `zoom-edit-${Date.now()}.${ext}`;
+      saveLink.classList.add('show');
+      saveLink.click();
+      document.body.classList.remove('is-recording');
+      updateRecordUI();
+
+      // Frames are only captured when the canvas is actually painted, so a
+      // backgrounded tab or a stalled machine yields a stuttering or empty file.
+      // Measure what really landed and say so rather than handing over a bad take.
+      const secs = (performance.now() - recStartedAt) / 1000;
+      const fps = secs > 0 ? recFrameCount / secs : 0;
+      if (fps < 10) alert(t('lowFpsWarn')(Math.round(fps)));
+    };
+
+    saveLink.classList.remove('show');
+    document.body.classList.add('is-recording');
+    recStartedAt = performance.now();
+    recFrameCount = 0;
+
+    const begin = () => {
+      draw();
+      recorder.start();
+      updateRecordUI();
+      video.play();
+      // Safety net: rAF is throttled to a standstill in a hidden/background tab, which
+      // would freeze the capture. Video frame callbacks keep firing, so drive a second
+      // draw source from them — the recording then never drops below source frame rate.
+      if (typeof video.requestVideoFrameCallback === 'function') {
+        const onVideoFrame = () => {
+          if (!recorder || recorder.state !== 'recording') return;
+          draw();
+          video.requestVideoFrameCallback(onVideoFrame);
+        };
+        video.requestVideoFrameCallback(onVideoFrame);
+      }
+    };
+    if (video.currentTime === 0) begin();
+    else { video.addEventListener('seeked', begin, { once: true }); video.currentTime = 0; }
+  }
+
+  function stopRecording() {
+    if (recorder && recorder.state === 'recording') recorder.stop();
+    video.pause();
+  }
+
+  function updateRecordUI() {
+    const on = !!(recorder && recorder.state === 'recording');
+    recordBtn.textContent = on ? t('stopRec') : t('startRec');
+    recordBtn.classList.toggle('recording', on);
+  }
+
+  recordBtn.addEventListener('click', () => {
+    if (recorder && recorder.state === 'recording') stopRecording();
+    else startRecording();
+  });
+
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (STR[lang][key] !== undefined) el.textContent = STR[lang][key];
+    });
+    langBtn.textContent = t('lang');
+    playBtn.textContent = video.paused ? t('play') : t('pause');
+    if (video.videoWidth) resBadge.textContent = t('canvasBadge')(video.videoWidth, video.videoHeight);
+    updateRecordUI();
+    updateSelectionUI();
+  }
+
+  langBtn.addEventListener('click', () => {
+    lang = lang === 'en' ? 'vi' : 'en';
+    applyLang();
+  });
+
+  applyLang();
+  window.addEventListener('resize', resizeCanvasToStage);
+})();
+</script>
+</body>
+</html>
