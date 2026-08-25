@@ -2,11 +2,17 @@
 
 A single-file, browser-based tool for adding CapCut-style Ken Burns zoom effects to a video, then exporting the result — no install, no upload, no server.
 
+**▶ [Try it now — no download needed](https://nixthinh-bit.github.io/zoom-demo-video/)**
+
 [🇻🇳 Tiếng Việt](README.vi.md)
 
-![Zoom effect demo](assets/demo.gif)
+## Demo
 
-*Preview of the zoom effect (using a placeholder test clip) — click a point, and the segment zooms smoothly in and back out.*
+https://github.com/nixthinh-bit/zoom-demo-video/raw/main/assets/demo-recording.mp4
+
+*If the video doesn't play inline above, [watch/download it directly](assets/demo-recording.mp4).*
+
+*Recorded with the tool itself, zooming into a chat reply for emphasis. The content on screen (chat messages, a "7-11 Holiday Campaign" doc) is placeholder/example material used for demos and practice — it is not real data and is not related to any real company.*
 
 ## Why this exists
 

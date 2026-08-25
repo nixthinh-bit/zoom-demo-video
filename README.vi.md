@@ -2,11 +2,17 @@
 
 Công cụ chỉnh video zoom in/out kiểu Ken Burns (giống CapCut) chạy gọn trong một file HTML — không cần cài đặt, không upload, không cần server.
 
+**▶ [Dùng thử ngay — không cần tải về](https://nixthinh-bit.github.io/zoom-demo-video/)**
+
 [🇬🇧 English](README.md)
 
-![Demo hiệu ứng zoom](assets/demo.gif)
+## Demo
 
-*Xem trước hiệu ứng zoom (dùng clip test mẫu) — click một điểm, đoạn zoom sẽ mượt mà zoom vào rồi zoom ra.*
+https://github.com/nixthinh-bit/zoom-demo-video/raw/main/assets/demo-recording.mp4
+
+*Nếu video không hiện trực tiếp ở trên, [xem/tải trực tiếp tại đây](assets/demo-recording.mp4).*
+
+*Quay bằng chính công cụ này, zoom vào một tin nhắn trả lời để nhấn mạnh. Nội dung xuất hiện trong video (tin nhắn chat, tài liệu "7-11 Holiday Campaign") là dữ liệu ví dụ/demo dùng để luyện tập, không phải dữ liệu thật và không liên quan đến bất kỳ công ty nào.*
 
 ## Vì sao có tool này
 
