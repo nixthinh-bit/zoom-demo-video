@@ -8,9 +8,9 @@ Công cụ chỉnh video zoom in/out kiểu Ken Burns (giống CapCut) chạy g�
 
 ## Demo
 
-[![Xem video demo](assets/demo-poster.jpg)](assets/demo-recording.mp4)
+https://github.com/user-attachments/assets/cbaa0d2c-6cca-428b-8ed2-0e9e0cc66167
 
-*Click vào ảnh, rồi bấm **View raw** để xem video (29s) — GitHub không preview trực tiếp được trên trang file. Quay bằng chính công cụ này, zoom vào một tin nhắn trả lời để nhấn mạnh. Nội dung xuất hiện trong video (tin nhắn chat, tài liệu "7-11 Holiday Campaign") là dữ liệu ví dụ/demo dùng để luyện tập, không phải dữ liệu thật và không liên quan đến bất kỳ công ty nào.*
+*Quay bằng chính công cụ này, zoom vào một tin nhắn trả lời để nhấn mạnh. Nội dung xuất hiện trong video (tin nhắn chat, tài liệu "7-11 Holiday Campaign") là dữ liệu ví dụ/demo dùng để luyện tập, không phải dữ liệu thật và không liên quan đến bất kỳ công ty nào.*
 
 ## Vì sao có tool này
 

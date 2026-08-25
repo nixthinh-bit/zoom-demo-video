@@ -8,9 +8,9 @@ A single-file, browser-based tool for adding CapCut-style Ken Burns zoom effects
 
 ## Demo
 
-[![Watch the demo video](assets/demo-poster.jpg)](assets/demo-recording.mp4)
+https://github.com/user-attachments/assets/cbaa0d2c-6cca-428b-8ed2-0e9e0cc66167
 
-*Click the image, then **View raw** to play the video (29s) — GitHub won't preview it inline on the file page. Recorded with the tool itself, zooming into a chat reply for emphasis. The content on screen (chat messages, a "7-11 Holiday Campaign" doc) is placeholder/example material used for demos and practice — it is not real data and is not related to any real company.*
+*Recorded with the tool itself, zooming into a chat reply for emphasis. The content on screen (chat messages, a "7-11 Holiday Campaign" doc) is placeholder/example material used for demos and practice — it is not real data and is not related to any real company.*
 
 ## Why this exists
 
