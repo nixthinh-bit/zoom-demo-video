@@ -287,8 +287,8 @@
       pick: 'Choose video…',
       dropNote: 'The video is read directly from your device — nothing is uploaded.',
       play: '▶ Play', pause: '⏸ Pause',
-      startRec: '● Record', stopRec: '■ Stop',
-      save: '⤓ Save recording',
+      startRec: '⤓ Save video', stopRec: '■ Stop',
+      save: '⤓ Download again',
       toolsTitle: 'Tools',
       addSeg: '+ Add zoom segment at playhead',
       highlightTool: 'Highlighter',
@@ -305,7 +305,7 @@
       hintAimZoom: 'Drag on the video to aim the zoom · drag a box corner to change the ratio',
       hintDrawHl: 'Drag on the video to draw a highlight box',
       play_title: 'Play / pause (Space)',
-      rec_title: 'Start / stop recording (R)',
+      rec_title: 'Save video: rewind, play through, save the file (R)',
       addSeg_title: 'Add a zoom segment at the playhead (A)',
       highlightTool_title: 'Toggle the Highlighter tool (H)',
       addHighlight_title: 'Add a highlight at the playhead',
@@ -324,7 +324,7 @@
           <tr><td><kbd>Space</kbd></td><td>Play / pause</td></tr>
           <tr><td><kbd>A</kbd></td><td>Add a zoom segment at the playhead</td></tr>
           <tr><td><kbd>H</kbd></td><td>Toggle the Highlighter tool</td></tr>
-          <tr><td><kbd>R</kbd></td><td>Start / stop recording</td></tr>
+          <tr><td><kbd>R</kbd></td><td>Save the video (rewind, play through, save), or stop early</td></tr>
           <tr><td><kbd>V</kbd></td><td>Toggle Aim view (preview the settled zoom while editing)</td></tr>
           <tr><td><kbd>[</kbd> <kbd>]</kbd></td><td>Selected zoom ratio by 0.1, or highlight dim opacity by 5%</td></tr>
           <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Step the playhead one frame</td></tr>
@@ -339,7 +339,7 @@
         <h3>Highlighter</h3>
         <p>Turn on the Highlighter tool and drag on the frame to draw a box that stays bright while the rest of the frame dims. Each highlight is its own item on the lower timeline lane with its own start and end. Drag the box or its handles to reshape it, and use Dim opacity to set how dark the rest goes. The dim layer is part of the recording; the aiming guides are not.</p>
         <h3>Timeline</h3>
-        <p>Drag a segment's edges to change its start and end, or drag its middle to move it. Playback keeps running while you adjust. Outside every zoom segment the video stays unzoomed. Record rewinds to the start, plays through at the video's native resolution, and stops on its own.</p>
+        <p>Drag a segment's edges to change its start and end, or drag its middle to move it; the playhead follows the edge you drag, so you see the exact frame where the effect now starts or ends. Selecting an item pauses the video and parks the playhead on it. Outside every zoom segment the video stays unzoomed. Save video rewinds to the start, plays through at the video's native resolution, and saves the file on its own.</p>
       `,
     },
     vi: {
@@ -348,8 +348,8 @@
       pick: 'Chọn video…',
       dropNote: 'Video được đọc trực tiếp từ máy, không upload lên đâu cả.',
       play: '▶ Phát', pause: '⏸ Tạm dừng',
-      startRec: '● Quay', stopRec: '■ Dừng quay',
-      save: '⤓ Lưu bản quay',
+      startRec: '⤓ Lưu video', stopRec: '■ Dừng',
+      save: '⤓ Tải lại file',
       toolsTitle: 'Công cụ',
       addSeg: '+ Thêm đoạn zoom tại playhead',
       highlightTool: 'Làm sáng vùng',
@@ -366,7 +366,7 @@
       hintAimZoom: 'Kéo trên video để ngắm điểm zoom · kéo góc khung để đổi tỷ lệ',
       hintDrawHl: 'Kéo trên video để vẽ vùng làm sáng',
       play_title: 'Phát / tạm dừng (Space)',
-      rec_title: 'Bắt đầu / dừng quay (R)',
+      rec_title: 'Lưu video: tua về đầu, phát hết, tự lưu file (R)',
       addSeg_title: 'Thêm đoạn zoom tại playhead (A)',
       highlightTool_title: 'Bật / tắt công cụ Làm sáng vùng (H)',
       addHighlight_title: 'Thêm một vùng sáng tại playhead',
@@ -385,7 +385,7 @@
           <tr><td><kbd>Space</kbd></td><td>Phát / tạm dừng</td></tr>
           <tr><td><kbd>A</kbd></td><td>Thêm đoạn zoom tại playhead</td></tr>
           <tr><td><kbd>H</kbd></td><td>Bật / tắt công cụ Làm sáng vùng</td></tr>
-          <tr><td><kbd>R</kbd></td><td>Bắt đầu / dừng quay</td></tr>
+          <tr><td><kbd>R</kbd></td><td>Lưu video (tua về đầu, phát hết, lưu file), hoặc dừng sớm</td></tr>
           <tr><td><kbd>V</kbd></td><td>Bật / tắt Xem thử zoom (xem trước mức zoom khi đang chỉnh)</td></tr>
           <tr><td><kbd>[</kbd> <kbd>]</kbd></td><td>Tỷ lệ zoom ±0.1, hoặc độ tối nền vùng sáng ±5%</td></tr>
           <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Dời playhead một khung hình</td></tr>
@@ -400,7 +400,7 @@
         <h3>Làm sáng vùng</h3>
         <p>Bật công cụ Làm sáng vùng rồi kéo trên khung hình để vẽ một vùng giữ nguyên độ sáng trong khi phần còn lại bị tối đi. Mỗi vùng sáng là một mục riêng ở làn dưới của timeline, có thời điểm bắt đầu và kết thúc riêng. Kéo khung hoặc các tay cầm để chỉnh hình dạng, dùng Độ tối nền để đặt mức tối cho phần còn lại. Lớp tối nằm trong bản quay; các đường ngắm thì không.</p>
         <h3>Timeline</h3>
-        <p>Kéo hai đầu đoạn để đổi thời điểm bắt đầu và kết thúc, kéo phần giữa để di chuyển. Video vẫn chạy trong lúc bạn chỉnh. Ngoài mọi đoạn zoom, video giữ nguyên không zoom. Nút Quay tự tua về đầu, phát hết ở độ phân giải gốc của video và tự dừng.</p>
+        <p>Kéo hai đầu đoạn để đổi thời điểm bắt đầu và kết thúc, kéo phần giữa để di chuyển; playhead bám theo đúng cạnh bạn đang kéo, nên bạn thấy ngay khung hình mà hiệu ứng bắt đầu hoặc kết thúc. Khi chọn một mục, video tạm dừng và playhead nhảy vào mục đó. Ngoài mọi đoạn zoom, video giữ nguyên không zoom. Nút Lưu video tự tua về đầu, phát hết ở độ phân giải gốc và tự lưu file.</p>
       `,
     },
   };
@@ -887,7 +887,11 @@
   }
 
   function beginDrag(mode, itemKind, item, e) {
-    dragMode = { mode, itemKind, id: item.id, startClientX: e.clientX, origStart: item.start, origEnd: item.end };
+    if (!video.paused) video.pause();
+    // where the playhead sat inside the item when the drag began, so a "move"
+    // can keep showing the same relative frame as the block slides
+    const grabOffset = clamp(video.currentTime - item.start, 0, item.end - item.start);
+    dragMode = { mode, itemKind, id: item.id, startClientX: e.clientX, origStart: item.start, origEnd: item.end, grabOffset };
     window.addEventListener('pointermove', onDragMove);
     window.addEventListener('pointerup', onDragEnd);
   }
@@ -908,19 +912,23 @@
     } else if (dragMode.mode === 'resize-end') {
       s.end = clamp(dragMode.origEnd + deltaTime, dragMode.origStart + MIN_LEN, dur);
     }
+    // pin the playhead to whatever you're dragging: the end edge, the start
+    // edge, or (when moving the whole block) the same spot inside it — so the
+    // preview always shows the exact frame that edge now lands on
+    let followT;
+    if (dragMode.mode === 'resize-end') followT = s.end;
+    else if (dragMode.mode === 'resize-start') followT = s.start;
+    else followT = s.start + Math.min(dragMode.grabOffset, s.end - s.start);
+    video.currentTime = clamp(followT, 0, dur);
     updateTimeline();
     updateSelectionUI();
-    if (video.paused) draw();
+    draw();
   }
   function onDragEnd() {
-    const itemKind = dragMode && dragMode.itemKind;
     dragMode = null;
     window.removeEventListener('pointermove', onDragMove);
     window.removeEventListener('pointerup', onDragEnd);
-    if (itemKind === 'zoom') {
-      const s = selectedZoom();
-      if (s) seekToPeak(s);
-    }
+    if (video.paused) draw();
   }
 
   timeline.addEventListener('pointerdown', (e) => {
@@ -937,14 +945,27 @@
     video.currentTime = pct * (video.duration || 0);
   }
 
-  // Only reposition the playhead while paused. If the video is playing, editing a
-  // segment must never interrupt or rewind playback.
-  function seekToPeak(s) {
-    if (!video.paused) return;
-    const len = s.end - s.start;
-    const totalRamp = s.zoomInDur + s.zoomOutDur;
-    const rampIn = totalRamp > len ? (s.zoomInDur / (totalRamp || 1)) * len : s.zoomInDur;
-    video.currentTime = clamp(s.start + rampIn, s.start, s.end);
+  // A representative moment inside an item: for a zoom, the point where it has
+  // finished ramping in; for a highlight, just past its fade-in.
+  function itemPreviewTime(kind, item) {
+    if (kind === 'zoom') {
+      const len = item.end - item.start;
+      const totalRamp = item.zoomInDur + item.zoomOutDur;
+      const rampIn = totalRamp > len ? (item.zoomInDur / (totalRamp || 1)) * len : item.zoomInDur;
+      return clamp(item.start + rampIn, item.start, item.end);
+    }
+    return clamp(item.start + Math.min(FADE_DUR * 2, (item.end - item.start) / 2), item.start, item.end);
+  }
+
+  // Editing an item parks the video on it: pause, and (when the playhead is
+  // outside the item, or force is set) jump to a moment where the effect is
+  // visible, so you can judge the timing instead of watching playback run past.
+  function parkOnItem(kind, item, force) {
+    if (!video.paused) video.pause();
+    const eps = 0.02;
+    const inside = video.currentTime >= item.start - eps && video.currentTime <= item.end + eps;
+    if (force || !inside) video.currentTime = itemPreviewTime(kind, item);
+    else draw();
   }
 
   function selectItem(kind, id) {
@@ -952,7 +973,6 @@
     if (!item) return;
     selection = { kind, id };
     if (kind === 'zoom') {
-      seekToPeak(item);
       zoomRange.value = item.zoom;
       zoomInRange.value = item.zoomInDur;
       zoomOutRange.value = item.zoomOutDur;
@@ -963,7 +983,7 @@
     updateTimeline();
     updateSelectionUI();
     refreshCanvasChrome();
-    if (video.paused) draw();
+    parkOnItem(kind, item, false);
   }
 
   function deselectItem() {
@@ -1041,7 +1061,7 @@
       if (!it || it.kind !== kind) return;
       it.item[prop] = parseFloat(el.value);
       labelEl.textContent = fmt(it.item[prop]);
-      if (video.paused) draw();
+      parkOnItem(it.kind, it.item, false);
     });
   }
   bindSlider(zoomRange, 'zoom', zoomLabel2, v => v.toFixed(2) + '×', 'zoom');
@@ -1141,6 +1161,11 @@
       else { canvasDrag = { type: 'focus' }; setFocusFromCanvasEvent(e); }
     }
     if (canvasDrag) {
+      if (!video.paused) video.pause();
+      if (canvasDrag.type !== 'hl-create') {
+        const sel = selectedItem();
+        if (sel) parkOnItem(sel.kind, sel.item, false);
+      }
       window.addEventListener('pointermove', onCanvasPointerMove);
       window.addEventListener('pointerup', onCanvasPointerUp);
       if (video.paused) draw();
