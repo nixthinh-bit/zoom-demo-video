@@ -1,6 +1,6 @@
 # Zoom Demo Video
 
-Công cụ chỉnh video zoom in/out kiểu Ken Burns (giống CapCut) chạy gọn trong một file HTML — không cần cài đặt, không upload, không cần server.
+Công cụ thêm hiệu ứng zoom in / zoom out cho video, chạy gọn trong một file HTML — không cần cài đặt, không upload, không cần server.
 
 **▶ [Dùng thử ngay — không cần tải về](https://nixthinh-bit.github.io/zoom-demo-video/)**
 
@@ -33,16 +33,46 @@ https://github.com/user-attachments/assets/cbaa0d2c-6cca-428b-8ed2-0e9e0cc66167
 ## Cách dùng
 
 1. Mở [`index.html`](index.html) bằng trình duyệt, hoặc dùng **[bản online](https://nixthinh-bit.github.io/zoom-demo-video/)** — không cần tải về.
-2. Kéo-thả video vào khung hình, hoặc bấm **Choose video…**.
-3. Bấm **+ Add zoom segment at playhead** để tạo một đoạn zoom tại đúng vị trí playhead hiện tại.
-4. Kéo hai đầu đoạn trên timeline để chỉnh chính xác thời điểm zoom bắt đầu/kết thúc. Kéo phần giữa để di chuyển cả đoạn.
-5. Kéo trên khung hình để ngắm điểm zoom. Khung nét đứt cho xem trước phần lọt frame; kéo góc để đổi tỷ lệ.
-6. Chỉnh 3 thanh trượt **Zoom ratio**, **Zoom-in speed**, **Zoom-out speed**, hoặc bấm `[` / `]` cho tỷ lệ.
-7. Tuỳ chọn: bấm **Highlighter** (hoặc phím `H`), kéo trên khung hình để vẽ vùng làm sáng, rồi đặt thời gian ở làn dưới của timeline và chỉnh **Dim opacity**.
-8. Lặp lại để thêm bao nhiêu đoạn zoom và vùng sáng tuỳ ý, ở bất kỳ vị trí nào trên timeline.
-9. Bấm **⤓ Lưu video**. App tự tua về đầu, tự phát hết video, và tự lưu file khi phát xong — không cần bấm gì thêm.
+2. Kéo-thả video vào khung hình, hoặc bấm **Choose video…**. File đọc trực tiếp trên máy, không upload đi đâu.
+3. Dời playhead bằng cách click hoặc kéo trên timeline, hoặc dùng `←` / `→`.
+
+### Thêm một đoạn zoom
+
+4. Bấm **+ Add zoom segment at playhead** (hoặc phím `A`). Một đoạn màu vàng hiện ở làn trên của timeline và được chọn; video tạm dừng và nhảy vào đoạn đó.
+5. Kéo **hai đầu** đoạn để đặt thời điểm zoom bắt đầu và kết thúc — playhead bám theo đúng cạnh bạn kéo, canh được tới từng khung hình. Kéo **phần giữa** để dời cả đoạn.
+6. **Kéo trên khung hình** để ngắm điểm zoom. **Khung ngắm** nét đứt cho thấy đúng phần sẽ lọt frame khi zoom hết cỡ; kéo bên trong để dời tâm, kéo **góc** để đổi tỷ lệ. Bật **Aim view** (`V`) để xem trước mức zoom đã đặt trong lúc căn.
+7. Tinh chỉnh bằng 3 thanh **Zoom ratio**, **Zoom-in speed**, **Zoom-out speed** (hoặc `[` / `]` cho tỷ lệ). Ngoài mọi đoạn, video luôn giữ nguyên không zoom.
+8. Click một đoạn trên timeline để chọn lại; **Delete** xoá đoạn đang chọn.
+
+### Thêm vùng làm sáng (tuỳ chọn)
+
+9. Bấm **Highlighter** (hoặc phím `H`), rồi **kéo trên khung hình** để vẽ một vùng. Vùng đó giữ nguyên độ sáng, phần còn lại bị tối đi.
+10. Đặt thời gian bằng cách kéo nó trên **làn dưới của timeline**, chỉnh độ tối bằng thanh **Dim opacity**. Lớp tối này nằm trong video xuất ra.
+
+### Lưu
+
+11. Bấm **⤓ Lưu video** (hoặc `R`). App tự tua về đầu, phát hết một lượt ở độ phân giải gốc, và tự lưu file khi kết thúc. Bấm lần nữa để dừng sớm. Dùng **⤓ Tải lại file** nếu cần lấy file thêm lần nữa.
 
 Vậy là xong — không cần chỉnh export, không cần chờ render.
+
+## Phím tắt
+
+Cũng có trong app ở nút **? Phím tắt** trên thanh trên cùng. Bỏ qua khi con trỏ đang ở trong thanh trượt (trừ `Esc` và `?`).
+
+| Phím | Tác dụng |
+|---|---|
+| `Space` | Phát / tạm dừng |
+| `A` | Thêm đoạn zoom tại playhead |
+| `H` | Bật / tắt công cụ Làm sáng vùng |
+| `R` | Lưu video (tua về đầu, phát, lưu), hoặc dừng sớm |
+| `V` | Bật / tắt Aim view (xem trước mức zoom khi đang chỉnh) |
+| `[` `]` | Tỷ lệ zoom ±0.1, hoặc độ tối nền vùng sáng ±5% |
+| `←` `→` | Dời playhead một khung hình |
+| `Shift` + `←` `→` | Dời playhead một giây |
+| `Alt` + phím mũi tên | Nhích điểm zoom (nếu trình duyệt cho phép) |
+| `Delete` / `Backspace` | Xoá đoạn zoom hoặc vùng sáng đang chọn |
+| `Esc` | Huỷ nét đang vẽ, thoát công cụ, bỏ chọn, hoặc đóng bảng phím tắt |
+| `?` | Hiện / ẩn bảng phím tắt |
 
 ## Lưu ý về trình duyệt
 
