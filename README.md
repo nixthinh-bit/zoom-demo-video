@@ -1,6 +1,6 @@
 # Zoom Demo Video
 
-A single-file, browser-based tool for adding CapCut-style Ken Burns zoom effects to a video, then exporting the result — no install, no upload, no server.
+A single-file, browser-based tool for adding zoom-in / zoom-out effects to a video, then exporting the result — no install, no upload, no server.
 
 **▶ [Try it now — no download needed](https://nixthinh-bit.github.io/zoom-demo-video/)**
 
@@ -33,16 +33,46 @@ You want a quick zoom-in / zoom-out effect on parts of a video — a specific po
 ## Usage
 
 1. Open [`index.html`](index.html) in a browser, or use the **[live version](https://nixthinh-bit.github.io/zoom-demo-video/)** — no download needed.
-2. Drag & drop a video onto the frame, or click **Choose video…**.
-3. Click **+ Add zoom segment at playhead** to create a zoom segment where the playhead currently is.
-4. Drag the segment's edges on the timeline to set exactly when the zoom starts and ends. Drag its middle to move the whole thing.
-5. Drag on the video frame to aim the zoom. The dashed aim box previews the framing; drag a corner to change the ratio.
-6. Adjust **Zoom ratio**, **Zoom-in speed**, and **Zoom-out speed** with the sliders, or press `[` / `]` for the ratio.
-7. Optional: click **Highlighter** (or press `H`), drag on the frame to draw a highlight box, then set its timing on the lower timeline lane and its **Dim opacity**.
-8. Repeat to add as many zoom segments and highlights as you want, anywhere on the timeline.
-9. Press **⤓ Save video**. It rewinds to the start, plays through automatically, and saves the finished clip once it reaches the end — nothing else to click.
+2. Drag & drop a video onto the frame, or click **Choose video…**. The file is read locally; nothing is uploaded.
+3. Move the playhead by clicking or dragging on the timeline, or with `←` / `→`.
+
+### Add a zoom
+
+4. Click **+ Add zoom segment at playhead** (or press `A`). A yellow segment appears on the top timeline lane and is selected; the video pauses and jumps onto it.
+5. Drag the segment's **left / right edges** to set when the zoom starts and ends — the playhead sticks to the edge you drag, so you can line it up to the exact frame. Drag the **middle** to move the whole segment.
+6. **Drag on the video frame** to aim the zoom. The dashed **aim box** shows exactly what will be in frame at full zoom; drag inside it to move the target, or drag a **corner** to change the ratio. Toggle **Aim view** (`V`) to preview the settled zoom while you aim.
+7. Fine-tune with the **Zoom ratio**, **Zoom-in speed**, and **Zoom-out speed** sliders (or `[` / `]` for the ratio). Outside every segment the video always stays unzoomed.
+8. Click a segment on the timeline to re-select it; **Delete** removes the selected one.
+
+### Add a highlight (optional)
+
+9. Click **Highlighter** (or press `H`), then **drag on the frame** to draw a box. It stays bright while the rest of the frame dims.
+10. Set its timing by dragging it on the **lower timeline lane**, and its darkness with the **Dim opacity** slider. The dim layer is included in the exported video.
+
+### Save
+
+11. Press **⤓ Save video** (or `R`). It rewinds to the start, plays through once at the video's native resolution, and saves the file automatically at the end. Press again to stop early. Use **⤓ Download again** to grab the file a second time.
 
 That's it — no export settings, no render queue.
+
+## Keyboard shortcuts
+
+Also shown in-app under **? Keys** in the top bar. Ignored while a slider is focused (except `Esc` and `?`).
+
+| Key | Action |
+|---|---|
+| `Space` | Play / pause |
+| `A` | Add a zoom segment at the playhead |
+| `H` | Toggle the Highlighter tool |
+| `R` | Save the video (rewind, play, save), or stop early |
+| `V` | Toggle Aim view (preview the settled zoom while editing) |
+| `[` `]` | Selected zoom ratio by 0.1, or highlight dim opacity by 5% |
+| `←` `→` | Step the playhead one frame |
+| `Shift` + `←` `→` | Step the playhead one second |
+| `Alt` + arrows | Nudge the zoom focus point (if your browser allows it) |
+| `Delete` / `Backspace` | Delete the selected segment or highlight |
+| `Esc` | Cancel a draw, exit the tool, deselect, or close the shortcut sheet |
+| `?` | Show / hide the shortcut sheet |
 
 ## Browser notes
 
