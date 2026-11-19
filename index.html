@@ -7,62 +7,118 @@
 <style>
   :root {
     color-scheme: dark;
-    --bg: #14161a;
-    --panel: #1e2126;
-    --panel-2: #262a31;
-    --border: #33383f;
+    --bg: #0e1013;
+    --panel: #171a1f;
+    --panel-2: #20242b;
+    --panel-3: #2a2f37;
+    --border: #2b3037;
     --text: #e8e9ec;
     --muted: #8a919c;
     --accent: #4da3ff;
     --accent-2: #ff6b6b;
     --seg: #ffd166;
-    --seg-fill: rgba(255, 209, 102, 0.28);
+    --seg-fill: rgba(255, 209, 102, 0.14);
     --hl: #7ee081;
-    --hl-fill: rgba(126, 224, 129, 0.28);
+    --hl-fill: rgba(126, 224, 129, 0.14);
+    --radius: 14px;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body {
     margin: 0; padding: 0; min-height: 100%;
     background: var(--bg); color: var(--text);
     font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
-  body {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 16px; padding: 20px;
-  }
+  body { padding: 16px; }
+
+  /* ---- top bar ---- */
   .topbar {
-    width: 100%; max-width: 1100px;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px;
+    max-width: 1320px; margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   }
-  .topbar h1 { font-size: 15px; font-weight: 600; margin: 0; color: var(--muted); }
-  .topbar .actions { display: flex; gap: 8px; align-items: center; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .logo {
+    width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--accent), #7ee0c8); color: #08131f; font-weight: 800;
+  }
+  .topbar h1 { font-size: 15px; font-weight: 600; margin: 0; }
+  .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+  /* ---- buttons & inputs ---- */
   button {
     background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
-    border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer;
+    border-radius: 8px; padding: 7px 12px; font: inherit; font-size: 13px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   }
-  button:hover { background: #2f343c; }
+  button:hover:not(:disabled) { background: var(--panel-3); }
   button:disabled { opacity: 0.4; cursor: not-allowed; }
-  button.primary { background: var(--accent); border-color: var(--accent); color: #08131f; font-weight: 600; }
   button.danger { color: var(--accent-2); }
+  button.ghost { background: transparent; }
+  button.full { width: 100%; }
   button.lang { min-width: 44px; font-weight: 700; }
-  button.rec { border-color: #7a3a3a; color: #ffb4b4; }
-  button.rec.recording { background: var(--accent-2); border-color: var(--accent-2); color: #2a0000; font-weight: 700; }
-  button.tool-btn.active { background: var(--accent); border-color: var(--accent); color: #08131f; font-weight: 600; }
-  button:focus-visible, input:focus-visible, a:focus-visible {
-    outline: 2px solid var(--accent); outline-offset: 2px;
+  button.icon { padding: 6px 0; min-width: 32px; }
+  button.rec { background: var(--accent-2); border-color: var(--accent-2); color: #2a0000; font-weight: 700; }
+  button.rec:hover:not(:disabled) { background: #ff8585; }
+  button.rec.recording { background: #fff; border-color: #fff; color: #c62828; }
+  button.play { min-width: 96px; background: var(--accent); border-color: var(--accent); color: #08131f; font-weight: 700; }
+  button.play:hover:not(:disabled) { background: #6cb4ff; }
+  button kbd, .kbd {
+    font: inherit; font-size: 10px; line-height: 1; color: var(--muted);
+    border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 4px; padding: 2px 4px;
+    background: rgba(0, 0, 0, 0.2);
   }
+  button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  input[type=range] { accent-color: var(--accent); }
+  input[type=number] {
+    width: 100%; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px;
+    font: inherit; font-size: 13px; font-variant-numeric: tabular-nums;
+  }
+  input[type=number]:disabled { opacity: 0.4; }
+  a.saveLink {
+    display: none; color: var(--accent); font-size: 13px; text-decoration: none;
+    border: 1px solid var(--accent); border-radius: 8px; padding: 6px 12px;
+  }
+  a.saveLink.show { display: inline-block; }
 
+  /* ---- bento grid ---- */
+  .bento {
+    max-width: 1320px; margin: 0 auto;
+    display: grid; gap: 14px;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-areas: "stage side" "tl tl";
+  }
+  @media (max-width: 880px) {
+    .bento { grid-template-columns: minmax(0, 1fr); grid-template-areas: "stage" "tl" "side"; }
+  }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px; display: flex; flex-direction: column; gap: 12px; min-width: 0;
+  }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 22px; }
+  .card-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); margin: 0;
+  }
+  .side { grid-area: side; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .badge {
+    font-size: 11px; color: var(--muted); background: var(--panel-2);
+    border: 1px solid var(--border); border-radius: 999px; padding: 2px 8px;
+    font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+  }
+  .badge:empty { display: none; }
+  .hint { color: var(--muted); font-size: 12px; }
+
+  /* ---- stage ---- */
+  .stage-card { grid-area: stage; padding: 10px; align-items: center; justify-content: center; background: #0a0b0d; }
   .stage {
     position: relative;
-    width: 100%; max-width: 1100px;
+    /* leave room for the timeline card below, so both fit on one screen */
+    width: min(100%, calc(max(240px, 100vh - 380px) * var(--arn, 1.7778)));
     aspect-ratio: var(--ar, 16 / 9);
-    flex-shrink: 0;
     min-height: 160px;
-    background: #000;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
+    background: #000; border-radius: 10px; overflow: hidden;
     display: flex; align-items: center; justify-content: center;
   }
   .stage.drag-over { outline: 2px dashed var(--accent); outline-offset: -2px; }
@@ -83,7 +139,6 @@
     animation: blink 1s steps(2, start) infinite;
   }
   @keyframes blink { to { opacity: 0.15; } }
-
   .canvasHint {
     position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%);
     z-index: 5; max-width: 90%; text-align: center;
@@ -91,84 +146,201 @@
     padding: 6px 14px; font-size: 12px; pointer-events: none;
   }
   .canvasHint:empty { display: none; }
-
   .dropHint {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     flex-direction: column; gap: 10px; color: var(--muted); text-align: center; padding: 20px;
   }
+  .dropHint .pick { background: var(--accent); border-color: var(--accent); color: #08131f; font-weight: 700; padding: 9px 16px; }
 
-  .panel {
-    width: 100%; max-width: 1100px;
-    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
-    padding: 14px 16px; display: flex; flex-direction: column; gap: 12px;
+  /* ---- side cards ---- */
+  .presets { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .presets button { padding: 5px 0; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .presets button.on { border-color: var(--accent); color: var(--accent); background: rgba(77, 163, 255, 0.12); }
+  .empty {
+    margin: 0; padding: 16px 12px; text-align: center; color: var(--muted); font-size: 12px;
+    border: 1px dashed var(--border); border-radius: 10px;
   }
-  .section { display: flex; flex-direction: column; gap: 10px; }
-  .section + .section { border-top: 1px solid var(--border); padding-top: 12px; }
-  .section-title {
-    font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
-    color: var(--muted); margin: 0;
-  }
-  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .row.between { justify-content: space-between; }
-  .time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; }
+  .fields3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .field { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--muted); }
+  .hint:empty { display: none; }
+  .fields3 label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--muted); }
+  .stack { display: flex; flex-direction: column; gap: 12px; }
+  .ctl { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 8px; }
+  .ctl label { font-size: 12px; color: var(--muted); }
+  .ctl input[type=range] { grid-column: 1 / -1; width: 100%; margin: 0; }
   .chip {
     font-variant-numeric: tabular-nums; font-size: 12px; color: var(--text);
     background: var(--panel-2); border: 1px solid var(--border); border-radius: 999px;
-    padding: 2px 8px; min-width: 46px; text-align: center;
+    padding: 1px 8px; min-width: 46px; text-align: center;
   }
+  .ctl-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .sublabel { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .motion-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .motion-opt {
+    position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 6px 2px 6px; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--panel-2); font-size: 11px; color: var(--muted); cursor: pointer; user-select: none;
+    white-space: nowrap;
+  }
+  .motion-opt:hover { background: var(--panel-3); }
+  .motion-opt input { position: absolute; opacity: 0; pointer-events: none; }
+  .motion-opt .curve { width: 40px; height: 22px; }
+  .motion-opt .curve path { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .motion-opt .tk {
+    position: absolute; top: 3px; right: 3px; width: 13px; height: 13px; border-radius: 4px; line-height: 11px !important;
+    border: 1px solid var(--border); font-style: normal; font-size: 10px; line-height: 13px; text-align: center;
+    color: transparent;
+  }
+  .motion-opt:has(input:checked) { border-color: var(--accent); background: rgba(77, 163, 255, 0.12); color: var(--text); }
+  .motion-opt:has(input:checked) .curve { color: var(--accent); }
+  .motion-opt input:checked ~ .tk { background: var(--accent); border-color: var(--accent); color: #08131f; font-weight: 800; }
+  .motion-opt:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button.tool-btn.active { background: var(--accent); border-color: var(--accent); color: #08131f; font-weight: 600; }
 
-  .timeline {
-    position: relative; height: 64px; background: var(--panel-2);
-    border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+  /* ---- timeline card ---- */
+  .tl-card { grid-area: tl; }
+  .transport { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .transport .group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; margin-left: 6px; }
+  .tlzoom { display: flex; align-items: center; gap: 6px; }
+  .tlzoom input { width: 120px; }
+  .tl-wrap {
+    display: grid; grid-template-columns: 84px minmax(0, 1fr);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--panel-2);
+  }
+  @media (max-width: 520px) { .tl-wrap { grid-template-columns: 64px minmax(0, 1fr); } .ll { padding: 0 6px; } }
+  .lane-labels { display: flex; flex-direction: column; border-right: 1px solid var(--border); background: var(--panel); }
+  .ll { height: 36px; display: flex; align-items: center; gap: 6px; padding: 0 10px; font-size: 11px; color: var(--muted); }
+  .ll.ruler-sp { height: 24px; border-bottom: 1px solid var(--border); }
+  .ll.video { height: 32px; border-bottom: 1px solid var(--border); padding-right: 4px; }
+  .ll.video button { margin-left: auto; padding: 2px 6px; font-size: 12px; }
+  .ll.zoom { border-bottom: 1px solid var(--border); }
+  .ll.zoom, .ll.hl { padding: 0; }
+  .ll-btn {
+    width: 100%; height: 100%; border: 0; border-radius: 0; background: transparent;
+    justify-content: flex-start; padding: 0 10px; font-size: 11px; color: var(--muted); gap: 6px;
+  }
+  .ll-btn .plus { margin-left: auto; font-size: 15px; line-height: 1; color: var(--text); opacity: 0.55; }
+  .ll-btn:hover:not(:disabled) .plus { opacity: 1; }
+  .ll i { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+  .ll.video i { background: #5b8def; }
+  .ll.zoom i { background: var(--seg); }
+  .ll.hl i { background: var(--hl); }
+  .tl-viewport { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
+  .tl-pad { display: inline-block; padding: 0 14px; min-width: 100%; vertical-align: top; }
+  .timeline { position: relative; height: 128px; width: 100%; cursor: copy; }
+  .timeline::before, .timeline::after {
+    content: ''; position: absolute; left: -14px; right: -14px; top: 55px; height: 1px;
+    background: var(--border); pointer-events: none;
+  }
+  .timeline::after { top: 91px; }
+  .ruler, .clip { cursor: pointer; }
+  .clip {
+    position: absolute; top: 28px; height: 24px; z-index: 1; border-radius: 6px;
+    background: repeating-linear-gradient(90deg, rgba(91, 141, 239, 0.34) 0 22px, rgba(91, 141, 239, 0.22) 22px 24px);
+    border: 1px solid rgba(91, 141, 239, 0.75);
+    display: flex; align-items: center; padding: 0 14px; overflow: hidden;
+    font-size: 11px; color: #dfe8ff; white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .lane-ghost {
+    position: absolute; height: 26px; z-index: 1; pointer-events: none; border-radius: 6px;
+    border: 1px dashed rgba(255, 209, 102, 0.6); background: rgba(255, 209, 102, 0.06);
+    display: flex; align-items: center; justify-content: center; color: #ffe3a0; font-size: 14px;
+  }
+  .lane-ghost.hl { border-color: rgba(126, 224, 129, 0.6); background: rgba(126, 224, 129, 0.06); color: #c7f3c8; }
+  .lane-ghost.pending { border-style: solid; background: rgba(255, 209, 102, 0.2); }
+  .lane-ghost.hl.pending { background: rgba(126, 224, 129, 0.2); }
+  .seam {
+    position: absolute; top: 66px; width: 16px; height: 16px; margin-left: -8px; z-index: 4;
+    border-radius: 4px; background: var(--seg); color: #2a1d00; pointer-events: none;
+    font-size: 10px; font-weight: 800; line-height: 16px; text-align: center;
+  }
+  .ruler {
+    position: absolute; left: -14px; right: -14px; top: 0; height: 24px;
+    border-bottom: 1px solid var(--border); background: var(--panel);
+  }
+  .tick { position: absolute; bottom: 0; width: 1px; height: 5px; background: #3a4048; pointer-events: none; }
+  .tick.major { height: 10px; background: #59616c; }
+  .tick span {
+    position: absolute; bottom: 9px; left: 3px; font-size: 10px; color: var(--muted);
+    white-space: nowrap; font-variant-numeric: tabular-nums;
   }
   .playhead {
-    position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent);
-    pointer-events: none; z-index: 3;
+    position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px;
+    background: var(--accent); pointer-events: none; z-index: 6;
   }
-  .segment { position: absolute; height: 24px; z-index: 2; }
-  .segment.zoom { top: 6px; }
-  .segment.highlight { top: 34px; }
+  .playhead::before {
+    content: ''; position: absolute; top: 0; left: -5px;
+    border: 6px solid transparent; border-top: 8px solid var(--accent); border-bottom: 0;
+  }
+  .segment { position: absolute; height: 26px; z-index: 2; }
+  .segment.zoom { top: 61px; }
+  .segment.highlight { top: 97px; }
   .seg-fill {
-    position: absolute; left: 6px; right: 6px; top: 0; bottom: 0;
-    background: var(--seg-fill); border: 1px solid var(--seg); border-radius: 4px;
-    cursor: grab;
+    position: absolute; inset: 0; overflow: hidden; cursor: grab;
+    background: var(--seg-fill); border: 1px solid rgba(255, 209, 102, 0.55); border-radius: 6px;
   }
-  .segment.selected .seg-fill { background: rgba(77, 163, 255, 0.35); border-color: var(--accent); }
-  .segment.highlight .seg-fill { background: var(--hl-fill); border-color: var(--hl); }
-  .segment.highlight.selected .seg-fill { background: rgba(126, 224, 129, 0.45); border-color: #d6f5d7; }
-  .seg-handle {
-    position: absolute; top: 0; bottom: 0; width: 14px;
-    background: var(--seg); border-radius: 3px; cursor: ew-resize; z-index: 3;
+  .seg-fill:active { cursor: grabbing; }
+  .seg-fill svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .seg-fill polygon { fill: rgba(255, 209, 102, 0.42); }
+  .seg-label {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+    white-space: nowrap; pointer-events: none;
   }
-  .segment.selected .seg-handle { background: var(--accent); }
-  .segment.highlight .seg-handle { background: var(--hl); }
-  .segment.highlight.selected .seg-handle { background: #d6f5d7; }
+  .segment.selected .seg-fill { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .segment.selected polygon { fill: rgba(77, 163, 255, 0.5); }
+  .segment.highlight .seg-fill { background: rgba(126, 224, 129, 0.32); border-color: rgba(126, 224, 129, 0.7); }
+  .segment.highlight.selected .seg-fill { background: rgba(126, 224, 129, 0.45); border-color: #d6f5d7; box-shadow: 0 0 0 1px #d6f5d7; }
+  .seg-handle { position: absolute; top: 0; bottom: 0; width: 10px; cursor: ew-resize; z-index: 3; }
+  .seg-handle::after {
+    content: ''; position: absolute; top: 5px; bottom: 5px; left: 3px; width: 4px; border-radius: 2px;
+    background: rgba(255, 255, 255, 0.85); opacity: 0; transition: opacity 0.12s;
+  }
+  .segment:hover .seg-handle::after, .segment.selected .seg-handle::after { opacity: 1; }
   .seg-handle.left { left: 0; }
   .seg-handle.right { right: 0; }
-
-  .kfControls { display: flex; align-items: center; gap: 10px; }
-  .kfControls label { color: var(--muted); font-size: 12px; white-space: nowrap; }
-  input[type=range] { width: 150px; }
-  .hint { color: var(--muted); font-size: 12px; }
-  .badge {
-    font-size: 11px; color: var(--muted); background: var(--panel-2);
-    border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px;
+  .trim-shade {
+    position: absolute; top: 24px; bottom: 0; z-index: 4; pointer-events: none;
+    background: rgba(0, 0, 0, 0.6);
   }
-  a.saveLink {
-    display: none; color: var(--accent); font-size: 13px; text-decoration: none;
-    border: 1px solid var(--accent); border-radius: 6px; padding: 6px 12px;
+  .trim-shade.left { left: 0; }
+  .trim-shade.right { right: 0; }
+  .trim-handle {
+    position: absolute; top: 27px; height: 26px; width: 10px; z-index: 5;
+    background: #5b8def; cursor: ew-resize; touch-action: none;
   }
-  a.saveLink.show { display: inline-block; }
+  .trim-handle::after {
+    content: ''; position: absolute; top: 7px; bottom: 7px; left: 4px; width: 2px;
+    background: #0b1a33; border-radius: 1px;
+  }
 
+  /* ---- right-click menu ---- */
+  .ctxmenu {
+    position: fixed; z-index: 60; min-width: 210px; padding: 5px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; gap: 1px;
+  }
+  .ctxmenu button { justify-content: space-between; border: 0; background: transparent; padding: 7px 10px; border-radius: 6px; }
+  .ctxmenu button:hover:not(:disabled) { background: var(--panel-3); }
+  .ctxmenu button.danger:hover { background: rgba(255, 107, 107, 0.15); }
+  .ctxmenu .sep { height: 1px; background: var(--border); margin: 3px 4px; }
+  .ctxmenu .lbl { font-size: 11px; color: var(--muted); padding: 4px 10px 2px; }
+  .ctxmenu .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; padding: 2px 4px 4px; }
+  .ctxmenu .row button { justify-content: center; padding: 5px 0; background: var(--panel-2); font-variant-numeric: tabular-nums; }
+  .trim-handle.left { border-radius: 4px 0 0 4px; transform: translateX(-100%); }
+  .trim-handle.right { border-radius: 0 4px 4px 0; }
+  .trim-handle.active { background: #9dbcff; }
+
+  /* ---- shortcut sheet ---- */
   .cheatsheet {
     position: fixed; inset: 0; z-index: 50; padding: 20px;
     display: flex; align-items: center; justify-content: center;
     background: rgba(0, 0, 0, 0.55);
   }
-  .cheatsheet[hidden] { display: none; }
   .cheatsheet-card {
-    position: relative; width: 100%; max-width: 560px; max-height: 80vh; overflow: auto;
-    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    position: relative; width: 100%; max-width: 580px; max-height: 80vh; overflow: auto;
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
     padding: 20px 22px;
   }
   .cheatsheet-close { position: absolute; top: 10px; right: 10px; padding: 4px 9px; }
@@ -186,91 +358,133 @@
 </head>
 <body>
 
-  <div class="topbar">
-    <h1 data-i18n="title">Zoom Timeline Editor</h1>
+  <header class="topbar">
+    <div class="brand"><span class="logo">◎</span><h1 data-i18n="title">Zoom Timeline Editor</h1><span class="badge" id="resBadge"></span></div>
     <div class="actions">
+      <a class="saveLink" id="saveLink" download data-i18n="save">⤓ Download again</a>
       <button id="helpBtn" data-i18n="help" data-i18n-title="help_title">? Keys</button>
       <button class="lang" id="langBtn">VI</button>
-      <button class="rec" id="recordBtn" disabled data-i18n-title="rec_title">● Record</button>
+      <button class="rec" id="recordBtn" disabled data-i18n-title="rec_title">⤓ Save video</button>
     </div>
-  </div>
+  </header>
 
-  <div class="stage" id="stage">
-    <canvas id="canvas"></canvas>
-    <div class="recDot"><i></i><span id="recTime">0.0s</span></div>
-    <div class="canvasHint" id="canvasHint"></div>
-    <div class="dropHint" id="dropHint">
-      <div data-i18n="dropHint1">Drag &amp; drop a video here, or</div>
-      <button class="primary" id="pickBtn" data-i18n="pick">Choose video…</button>
-      <div class="hint" data-i18n="dropNote">The video is read directly from your device — nothing is uploaded.</div>
-    </div>
-  </div>
-  <input type="file" id="fileInput" accept="video/*" style="display:none">
-
-  <div class="panel">
-    <div class="section">
-      <div class="row between">
-        <div class="row">
-          <button id="playBtn" disabled data-i18n="play" data-i18n-title="play_title">▶ Play</button>
-          <span class="time" id="timeLabel">0.00 / 0.00s</span>
-          <a class="saveLink" id="saveLink" download data-i18n="save">⤓ Save recording</a>
+  <main class="bento">
+    <section class="card stage-card">
+      <div class="stage" id="stage">
+        <canvas id="canvas"></canvas>
+        <div class="recDot"><i></i><span id="recTime">0.0s</span></div>
+        <div class="canvasHint" id="canvasHint"></div>
+        <div class="dropHint" id="dropHint">
+          <div data-i18n="dropHint1">Drag &amp; drop a video here, or</div>
+          <button class="pick" id="pickBtn" data-i18n="pick">Choose video…</button>
+          <div class="hint" data-i18n="dropNote">The video is read directly from your device — nothing is uploaded.</div>
         </div>
-        <span class="badge" id="resBadge">—</span>
       </div>
-    </div>
+      <input type="file" id="fileInput" accept="video/*" style="display:none">
+    </section>
 
-    <div class="section">
-      <div class="section-title" data-i18n="toolsTitle">Tools</div>
-      <div class="row">
-        <button id="addSegBtn" disabled data-i18n="addSeg" data-i18n-title="addSeg_title">+ Add zoom segment at playhead</button>
-        <button id="highlightBtn" class="tool-btn" disabled data-i18n="highlightTool" data-i18n-title="highlightTool_title">Highlighter</button>
-        <button id="addHighlightBtn" disabled data-i18n="addHighlight" data-i18n-title="addHighlight_title">+ Highlight at playhead</button>
-        <button id="delSegBtn" class="danger" disabled data-i18n="delItem" data-i18n-title="delItem_title">Delete selected</button>
-      </div>
-    </div>
+    <aside class="side">
+      <section class="card">
+        <div class="card-head">
+          <span class="card-title" data-i18n="motionTitle">Motion</span>
+          <span class="badge" data-i18n="motionScope">all zooms</span>
+        </div>
+        <div class="motion-grid" role="radiogroup">
+          <label class="motion-opt" data-i18n-title="ease_smooth_title"><input type="radio" name="ease" value="smooth"><i class="tk">✓</i><svg class="curve" data-ease="smooth" viewBox="0 0 40 24"></svg><span data-i18n="ease_smooth">Smooth</span></label>
+          <label class="motion-opt" data-i18n-title="ease_snappy_title"><input type="radio" name="ease" value="snappy"><i class="tk">✓</i><svg class="curve" data-ease="snappy" viewBox="0 0 40 24"></svg><span data-i18n="ease_snappy">Snappy</span></label>
+          <label class="motion-opt" data-i18n-title="ease_spring_title"><input type="radio" name="ease" value="spring"><i class="tk">✓</i><svg class="curve" data-ease="spring" viewBox="0 0 40 24"></svg><span data-i18n="ease_spring">Spring</span></label>
+          <label class="motion-opt" data-i18n-title="ease_cut_title"><input type="radio" name="ease" value="cut"><i class="tk">✓</i><svg class="curve" data-ease="cut" viewBox="0 0 40 24"></svg><span data-i18n="ease_cut">Cut</span></label>
+        </div>
+        <button id="motionPreviewBtn" disabled data-i18n-title="motionPreview_title"><span data-i18n="motionPreview">▶ Try motion</span></button>
+      </section>
 
-    <div class="timeline" id="timeline"><div class="playhead" id="playhead"></div></div>
+      <section class="card">
+        <div class="card-head">
+          <span class="card-title" data-i18n="selectedLabel">Selected</span>
+          <span class="badge" id="selBadge"></span>
+        </div>
+        <p class="empty" id="selEmpty" data-i18n="emptySel">Click a block on the timeline, or add one above.</p>
 
-    <div class="section">
-      <div class="row">
-        <span class="section-title" data-i18n="selectedLabel">Selected:</span>
-        <span class="badge" id="selBadge" data-i18n="noneSelected">none selected</span>
-      </div>
+        <div class="grid2" id="timeFields" hidden>
+          <label class="field"><span data-i18n="fStart">Zoom in at (s)</span><input type="number" id="fStart" step="0.1" min="0"></label>
+          <label class="field"><span id="fLenLabel">Hold for (s)</span><input type="number" id="fLen" step="0.1" min="0.1"></label>
+        </div>
+        <div class="hint" id="holdHint"></div>
 
-      <div id="zoomControls" hidden>
-        <div class="row between">
-          <div class="kfControls">
+        <div class="stack" id="zoomControls" hidden>
+          <div class="ctl">
             <label for="zoomRange" data-i18n="zoomLabel">Zoom ratio</label>
-            <input type="range" id="zoomRange" min="1" max="6" step="0.05" value="1.8" disabled>
             <span class="chip" id="zoomLabel2"></span>
+            <input type="range" id="zoomRange" min="1" max="6" step="0.05" value="1.8" disabled>
           </div>
-          <button id="aimPreviewBtn" class="tool-btn" data-i18n="aimView" data-i18n-title="aimView_title">Aim view</button>
+          <div class="presets" id="zoomPresets">
+            <button data-z="1.5">1.5×</button><button data-z="2">2×</button><button data-z="2.5">2.5×</button><button data-z="3">3×</button>
+          </div>
+          <div class="hint" data-i18n="aimHint">Drag the dot on the video to choose where to look.</div>
+          <div class="grid2">
+            <button id="applyAllBtn" data-i18n-title="applyAll_title"><span data-i18n="applyAll">Use for all</span></button>
+            <button id="aimPreviewBtn" class="tool-btn" data-i18n-title="aimView_title"><span data-i18n="aimView">Aim view</span><kbd>V</kbd></button>
+          </div>
         </div>
-        <div class="row between">
-          <div class="kfControls">
-            <label for="zoomInRange" data-i18n="zoomInLabel">Zoom-in speed</label>
-            <input type="range" id="zoomInRange" min="0.1" max="3" step="0.1" value="0.6" disabled>
-            <span class="chip" id="zoomInLabel2"></span>
+
+        <div class="stack" id="highlightControls" hidden>
+          <div class="ctl">
+            <label for="opacityRange" data-i18n="opacityLabel">Dim opacity</label>
+            <span class="chip" id="opacityLabel2"></span>
+            <input type="range" id="opacityRange" min="0" max="0.9" step="0.05" value="0.65" disabled>
           </div>
-          <div class="kfControls">
-            <label for="zoomOutRange" data-i18n="zoomOutLabel">Zoom-out speed</label>
-            <input type="range" id="zoomOutRange" min="0.1" max="3" step="0.1" value="0.6" disabled>
-            <span class="chip" id="zoomOutLabel2"></span>
+        </div>
+
+        <button id="delSegBtn" class="danger full" hidden data-i18n-title="delItem_title"><span data-i18n="delItem">Delete</span><kbd>Del</kbd></button>
+      </section>
+
+    </aside>
+
+    <section class="card tl-card">
+      <div class="transport">
+        <div class="group">
+          <button id="playBtn" class="play" disabled data-i18n-title="play_title">▶ Play</button>
+          <button id="prevFrameBtn" class="icon" disabled data-i18n-title="prevFrame_title" aria-label="Previous frame">◀</button>
+          <button id="nextFrameBtn" class="icon" disabled data-i18n-title="nextFrame_title" aria-label="Next frame">▶</button>
+          <span class="time" id="timeLabel">0.00 / 0.00s</span>
+        </div>
+        <div class="group">
+          <div class="tlzoom">
+            <button id="tlOutBtn" class="icon" disabled data-i18n-title="tlOut_title" aria-label="Zoom timeline out">−</button>
+            <input type="range" id="tlZoomRange" min="0" max="1" step="0.001" value="0" disabled aria-label="Timeline zoom">
+            <button id="tlInBtn" class="icon" disabled data-i18n-title="tlIn_title" aria-label="Zoom timeline in">+</button>
+            <button id="tlFitBtn" disabled data-i18n="tlFit" data-i18n-title="tlFit_title">Fit</button>
           </div>
         </div>
       </div>
 
-      <div id="highlightControls" hidden>
-        <div class="row">
-          <div class="kfControls">
-            <label for="opacityRange" data-i18n="opacityLabel">Dim opacity</label>
-            <input type="range" id="opacityRange" min="0" max="0.9" step="0.05" value="0.65" disabled>
-            <span class="chip" id="opacityLabel2"></span>
+      <div class="tl-wrap">
+        <div class="lane-labels">
+          <div class="ll ruler-sp"></div>
+          <div class="ll video"><i></i><span data-i18n="laneVideo">Video</span><button id="trimResetBtn" class="ghost" hidden data-i18n-title="trimReset_title">↺</button></div>
+          <div class="ll zoom"><button class="ll-btn" id="addSegBtn" disabled data-i18n-title="addSeg_title"><i></i><span data-i18n="laneZoom">Zoom</span><span class="plus">+</span></button></div>
+          <div class="ll hl"><button class="ll-btn" id="addHighlightBtn" disabled data-i18n-title="addHighlight_title"><i></i><span data-i18n="laneHl">Highlight</span><span class="plus">+</span></button></div>
+        </div>
+        <div class="tl-viewport" id="tlViewport">
+          <div class="tl-pad">
+            <div class="timeline" id="timeline">
+              <div class="ruler" id="ruler"></div>
+              <div class="clip" id="clip" data-i18n-title="clip_title"><span id="clipLabel"></span></div>
+              <div class="lane-ghost" id="laneGhost" hidden>+</div>
+              <div class="playhead" id="playhead"></div>
+              <div class="trim-shade left" id="trimShadeL"></div>
+              <div class="trim-shade right" id="trimShadeR"></div>
+              <div class="trim-handle left" id="trimHandleL" data-i18n-title="trimHandle_title"></div>
+              <div class="trim-handle right" id="trimHandleR" data-i18n-title="trimHandle_title"></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+      <div class="hint" data-i18n="tlHint">Click the Zoom lane to add a zoom, or drag across it · right-click a block for more · pinch to zoom the timeline</div>
+    </section>
+  </main>
+
+  <div class="ctxmenu" id="ctxMenu" hidden></div>
 
   <div class="cheatsheet" id="cheatSheet" hidden>
     <div class="cheatsheet-card">
@@ -290,57 +504,87 @@
       play: '▶ Play', pause: '⏸ Pause',
       startRec: '⤓ Save video', stopRec: '■ Stop',
       save: '⤓ Download again',
-      toolsTitle: 'Tools',
-      addSeg: '+ Add zoom segment at playhead',
-      highlightTool: 'Highlighter',
-      addHighlight: '+ Highlight at playhead',
-      delItem: 'Delete selected',
+      delItem: 'Delete',
+      laneVideo: 'Video',
+      trimReset_title: 'Undo the trim and keep the whole video',
+      trimHandle_title: 'Drag to cut the start or end of the video (or I / O at the playhead)',
+      clip_title: 'Your video. Drag its blue ends to cut the start or the end',
+      clipLabel: (a, b, full) => full ? `Video · ${(b - a).toFixed(1)}s` : `Cut: ${a.toFixed(2)} → ${b.toFixed(2)}s · ${(b - a).toFixed(1)}s`,
+      motionTitle: 'Motion', motionScope: 'all zooms',
+      aimHint: 'Drag the dot on the video to choose where to look.',
+      applyAll: 'Use for all', applyAll_title: 'Give every zoom this ratio',
+      hintEditHl: 'Drag the box to move it, a handle to resize it, or outside it to draw it again',
+      hintEmpty: 'Click the Zoom lane on the timeline to add a zoom',
+      ctxSplit: 'Split at playhead', ctxCopy: 'Copy', ctxDup: 'Duplicate', ctxDelete: 'Delete',
+      ctxPaste: 'Paste here', ctxAddZoom: 'Add zoom here', ctxAddHl: 'Add highlight here', ctxLevel: 'Zoom level',
+      ctxResetTrim: 'Undo trim', ctxTrimIn: 'Start video at playhead', ctxTrimOut: 'End video at playhead',
       aimView: 'Aim view',
       help: '? Keys',
-      selectedLabel: 'Selected:',
-      noneSelected: 'none selected',
+      selectedLabel: 'Selected',
+      emptySel: 'Click a block on the timeline to edit it. To add a zoom, click the Zoom lane or drag across it.',
+      fStart: 'Zoom in at (s)', fHold: 'Hold for (s)', fLen: 'Show for (s)', fStartHl: 'Start (s)',
+      holdHint: (a, b) => `Zooms in at ${a.toFixed(1)}s and is back to normal at ${b.toFixed(1)}s.`,
+      laneZoom: 'Zoom', laneHl: 'Highlight',
+      tlFit: 'Fit',
+      tlFit_title: 'Show the whole video (0)',
+      tlIn_title: 'Zoom the timeline in (=)',
+      tlOut_title: 'Zoom the timeline out (-)',
+      prevFrame_title: 'Previous frame (←)',
+      nextFrame_title: 'Next frame (→)',
+      tlHint: 'Click the Zoom lane to add a zoom, or drag across it · put two zooms edge to edge to pan between them · right-click a block for more · pinch to zoom the timeline',
       zoomLabel: 'Zoom ratio',
-      zoomInLabel: 'Zoom-in speed',
-      zoomOutLabel: 'Zoom-out speed',
+      ease_smooth: 'Smooth', ease_snappy: 'Snappy', ease_spring: 'Spring', ease_cut: 'Cut',
+      ease_smooth_title: 'Starts gently, speeds up, lands gently. The safe default',
+      ease_snappy_title: 'Moves fast at once, then settles softly onto the target',
+      ease_spring_title: 'Overshoots the target slightly and springs back',
+      ease_cut_title: 'No animation: jumps straight in and straight out',
+      motionPreview: '▶ Try motion',
+      motionPreview_title: 'Play the selected zoom (or the first one) to see the motion',
       opacityLabel: 'Dim opacity',
-      hintAimZoom: 'Drag on the video to aim the zoom · drag a box corner to change the ratio',
-      hintDrawHl: 'Drag on the video to draw a highlight box',
+      hintAimZoom: 'Drag the dot to choose where to look · pinch or drag a box corner to change the ratio',
       play_title: 'Play / pause (Space)',
       rec_title: 'Save video: rewind, play through, save the file (R)',
-      addSeg_title: 'Add a zoom segment at the playhead (A)',
-      highlightTool_title: 'Toggle the Highlighter tool (H)',
-      addHighlight_title: 'Add a highlight at the playhead',
+      addSeg_title: 'Add a zoom at the playhead (A)',
+      addHighlight_title: 'Add a highlight at the playhead (H)',
       delItem_title: 'Delete the selected segment or highlight (Delete)',
       aimView_title: 'Preview the settled zoom while editing (V)',
       help_title: 'Keyboard shortcuts (?)',
       lang: 'VI',
       canvasBadge: (vw, vh) => `Output: ${vw}×${vh} (source resolution)`,
-      segBadge: (s) => `zoom ${s.start.toFixed(2)}s → ${s.end.toFixed(2)}s`,
-      hlBadge: (h) => `highlight ${h.start.toFixed(2)}s → ${h.end.toFixed(2)}s`,
+      segBadge: (s) => `Zoom ${s.zoom.toFixed(2)}×`,
+      hlBadge: () => 'Highlight',
       recFail: 'Recording is not supported in this browser.',
       lowFpsWarn: (fps) => `Only ~${fps} frames per second were captured, so this take will stutter. Keep this tab visible and in the foreground while recording — browsers suspend drawing in background tabs.`,
       cheatHtml: `
         <h3>Keyboard shortcuts</h3>
         <table>
+          <tr><td>Click the Zoom lane</td><td>Add a zoom there. Drag across the lane to make it as long as you drag</td></tr>
+          <tr><td>Right-click a block</td><td>Split, zoom level, copy, duplicate, delete</td></tr>
           <tr><td><kbd>Space</kbd></td><td>Play / pause</td></tr>
-          <tr><td><kbd>A</kbd></td><td>Add a zoom segment at the playhead</td></tr>
-          <tr><td><kbd>H</kbd></td><td>Toggle the Highlighter tool</td></tr>
+          <tr><td><kbd>A</kbd> / <kbd>H</kbd></td><td>Add a zoom / a highlight at the playhead</td></tr>
+          <tr><td><kbd>X</kbd></td><td>Split the selected block (or the zoom under the playhead) at the playhead</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>Z</kbd> / <kbd>Shift</kbd> + <kbd>Cmd</kbd> + <kbd>Z</kbd></td><td>Undo / redo</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>C</kbd> <kbd>V</kbd> <kbd>D</kbd></td><td>Copy / paste at the playhead / duplicate</td></tr>
           <tr><td><kbd>R</kbd></td><td>Save the video (rewind, play through, save), or stop early</td></tr>
+          <tr><td><kbd>I</kbd> <kbd>O</kbd></td><td>Cut: start / end the video at the playhead</td></tr>
           <tr><td><kbd>V</kbd></td><td>Toggle Aim view (preview the settled zoom while editing)</td></tr>
           <tr><td><kbd>[</kbd> <kbd>]</kbd></td><td>Selected zoom ratio by 0.1, or highlight dim opacity by 5%</td></tr>
-          <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Step the playhead one frame</td></tr>
-          <tr><td><kbd>Shift</kbd> + <kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Step the playhead one second</td></tr>
-          <tr><td><kbd>Alt</kbd> + arrows</td><td>Nudge the zoom focus point, if your browser allows it</td></tr>
-          <tr><td><kbd>Delete</kbd></td><td>Delete the selected segment or highlight</td></tr>
-          <tr><td><kbd>Esc</kbd></td><td>Cancel a draw, exit the tool, deselect, or close this panel</td></tr>
+          <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Step the playhead one frame (<kbd>Shift</kbd>: one second)</td></tr>
+          <tr><td><kbd>Delete</kbd></td><td>Delete the selected block</td></tr>
+          <tr><td><kbd>=</kbd> <kbd>-</kbd> <kbd>0</kbd></td><td>Zoom the timeline in / out / fit the whole video</td></tr>
+          <tr><td>Pinch, <kbd>Ctrl</kbd> + scroll</td><td>On the timeline: zoom it. On the video: change the selected zoom ratio</td></tr>
+          <tr><td><kbd>Alt</kbd> while dragging</td><td>Turn off snapping to other edges</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>Close a menu, deselect, or close this panel</td></tr>
           <tr><td><kbd>?</kbd></td><td>Show or hide this panel</td></tr>
         </table>
-        <h3>Aiming a zoom</h3>
-        <p>Select a zoom segment, then drag on the frame. The dashed box shows exactly what the zoom will frame at full ratio. Drag inside it to move the target, drag a corner to change the zoom ratio. Near the frame edges the box stops at the boundary even as the crosshair keeps moving, because playback clamps the view the same way.</p>
-        <h3>Highlighter</h3>
-        <p>Turn on the Highlighter tool and drag on the frame to draw a box that stays bright while the rest of the frame dims. Each highlight is its own item on the lower timeline lane with its own start and end. Drag the box or its handles to reshape it, and use Dim opacity to set how dark the rest goes. The dim layer is part of the recording; the aiming guides are not.</p>
-        <h3>Timeline</h3>
-        <p>Drag a segment's edges to change its start and end, or drag its middle to move it; the playhead follows the edge you drag, so you see the exact frame where the effect now starts or ends. Selecting an item pauses the video and parks the playhead on it. Outside every zoom segment the video stays unzoomed. Save video rewinds to the start, plays through at the video's native resolution, and saves the file on its own.</p>
+        <h3>A zoom has two settings</h3>
+        <p>How far it zooms (the ratio, with 1.5× to 3× one click away) and where it looks (drag the dot on the video). Each zoom zooms in at its start, holds for the time you set, then goes back to normal by itself. How it moves in and out is set once for the whole video in the Motion card: Smooth, Snappy, Spring or Cut.</p>
+        <h3>Pan from one spot to another</h3>
+        <p>Put two zooms edge to edge (edges snap together, or split one zoom with <kbd>X</kbd>). The view then glides from the first spot to the second without zooming out in between. A small ⇄ mark shows where it pans.</p>
+        <h3>Highlights</h3>
+        <p>Click the Highlight lane or press <kbd>H</kbd>. The rest of the frame dims while the box stays bright. With a highlight selected, drag its box or handles on the video, or drag outside it to draw it again.</p>
+        <h3>Cut the video</h3>
+        <p>Drag either blue end of the Video lane, or press <kbd>I</kbd> / <kbd>O</kbd> at the playhead. Play and Save video then cover only the part that is left. Nothing is deleted from your file: ↺ next to the lane name brings it all back.</p>
       `,
     },
     vi: {
@@ -351,57 +595,87 @@
       play: '▶ Phát', pause: '⏸ Tạm dừng',
       startRec: '⤓ Lưu video', stopRec: '■ Dừng',
       save: '⤓ Tải lại file',
-      toolsTitle: 'Công cụ',
-      addSeg: '+ Thêm đoạn zoom tại playhead',
-      highlightTool: 'Làm sáng vùng',
-      addHighlight: '+ Vùng sáng tại playhead',
-      delItem: 'Xoá mục đang chọn',
-      aimView: 'Xem thử zoom',
+      delItem: 'Xoá',
+      laneVideo: 'Video',
+      trimReset_title: 'Bỏ cắt, giữ lại toàn bộ video',
+      trimHandle_title: 'Kéo để cắt phần đầu hoặc phần cuối video (hoặc I / O tại playhead)',
+      clip_title: 'Video của bạn. Kéo hai đầu màu xanh để cắt phần đầu hoặc phần cuối',
+      clipLabel: (a, b, full) => full ? `Video · ${(b - a).toFixed(1)}s` : `Đã cắt: ${a.toFixed(2)} → ${b.toFixed(2)}s · ${(b - a).toFixed(1)}s`,
+      motionTitle: 'Chuyển động', motionScope: 'mọi đoạn zoom',
+      aimHint: 'Kéo chấm trên video để chọn chỗ cần nhìn.',
+      applyAll: 'Áp cho tất cả', applyAll_title: 'Đặt tỷ lệ này cho mọi đoạn zoom',
+      hintEditHl: 'Kéo khung để dời, kéo tay cầm để đổi cỡ, kéo ra ngoài khung để vẽ lại',
+      hintEmpty: 'Click vào dải Zoom dưới timeline để thêm zoom',
+      ctxSplit: 'Tách tại playhead', ctxCopy: 'Sao chép', ctxDup: 'Nhân bản', ctxDelete: 'Xoá',
+      ctxPaste: 'Dán vào đây', ctxAddZoom: 'Thêm zoom ở đây', ctxAddHl: 'Thêm vùng sáng ở đây', ctxLevel: 'Mức zoom',
+      ctxResetTrim: 'Bỏ cắt', ctxTrimIn: 'Cho video bắt đầu tại playhead', ctxTrimOut: 'Cho video kết thúc tại playhead',
+      aimView: 'Xem khung zoom',
       help: '? Phím tắt',
-      selectedLabel: 'Đang chọn:',
-      noneSelected: 'chưa chọn',
+      selectedLabel: 'Đang chọn',
+      emptySel: 'Bấm vào một khối trên timeline để chỉnh. Muốn thêm zoom, click vào dải Zoom hoặc kéo quét trên đó.',
+      fStart: 'Zoom vào lúc (s)', fHold: 'Giữ zoom (s)', fLen: 'Hiện trong (s)', fStartHl: 'Bắt đầu (s)',
+      holdHint: (a, b) => `Zoom vào lúc ${a.toFixed(1)}s, tự trở lại màn hình thường lúc ${b.toFixed(1)}s.`,
+      laneZoom: 'Zoom', laneHl: 'Vùng sáng',
+      tlFit: 'Vừa khung',
+      tlFit_title: 'Xem toàn bộ video (0)',
+      tlIn_title: 'Phóng to timeline (=)',
+      tlOut_title: 'Thu nhỏ timeline (-)',
+      prevFrame_title: 'Lùi một khung hình (←)',
+      nextFrame_title: 'Tiến một khung hình (→)',
+      tlHint: 'Click vào dải Zoom để thêm, hoặc kéo quét trên đó · đặt hai zoom sát nhau để lia từ chỗ này sang chỗ kia · chuột phải vào khối để có thêm lựa chọn · chụm hai ngón để phóng timeline',
       zoomLabel: 'Tỷ lệ zoom',
-      zoomInLabel: 'Tốc độ zoom vào',
-      zoomOutLabel: 'Tốc độ zoom ra',
+      ease_smooth: 'Mượt', ease_snappy: 'Nhanh', ease_spring: 'Nảy', ease_cut: 'Cắt cứng',
+      ease_smooth_title: 'Chậm lúc đầu, nhanh ở giữa, chậm lúc đáp. Lựa chọn an toàn',
+      ease_snappy_title: 'Lao nhanh ngay từ đầu rồi đáp nhẹ vào điểm đích',
+      ease_spring_title: 'Vượt quá điểm đích một chút rồi nảy về',
+      ease_cut_title: 'Không chuyển động: nhảy thẳng vào và nhảy thẳng ra',
+      motionPreview: '▶ Xem thử',
+      motionPreview_title: 'Phát đoạn zoom đang chọn (hoặc đoạn đầu tiên) để xem chuyển động',
       opacityLabel: 'Độ tối nền',
-      hintAimZoom: 'Kéo trên video để ngắm điểm zoom · kéo góc khung để đổi tỷ lệ',
-      hintDrawHl: 'Kéo trên video để vẽ vùng làm sáng',
+      hintAimZoom: 'Kéo chấm để chọn chỗ cần nhìn · chụm hai ngón hoặc kéo góc khung để đổi tỷ lệ',
       play_title: 'Phát / tạm dừng (Space)',
       rec_title: 'Lưu video: tua về đầu, phát hết, tự lưu file (R)',
       addSeg_title: 'Thêm đoạn zoom tại playhead (A)',
-      highlightTool_title: 'Bật / tắt công cụ Làm sáng vùng (H)',
-      addHighlight_title: 'Thêm một vùng sáng tại playhead',
+      addHighlight_title: 'Thêm vùng sáng tại playhead (H)',
       delItem_title: 'Xoá đoạn zoom hoặc vùng sáng đang chọn (Delete)',
       aimView_title: 'Xem trước mức zoom đã đặt trong lúc chỉnh (V)',
       help_title: 'Phím tắt (?)',
       lang: 'EN',
       canvasBadge: (vw, vh) => `Đầu ra: ${vw}×${vh} (đúng độ phân giải gốc)`,
-      segBadge: (s) => `zoom ${s.start.toFixed(2)}s → ${s.end.toFixed(2)}s`,
-      hlBadge: (h) => `vùng sáng ${h.start.toFixed(2)}s → ${h.end.toFixed(2)}s`,
+      segBadge: (s) => `Zoom ${s.zoom.toFixed(2)}×`,
+      hlBadge: () => 'Vùng sáng',
       recFail: 'Trình duyệt này không hỗ trợ ghi hình.',
       lowFpsWarn: (fps) => `Chỉ ghi được khoảng ${fps} hình/giây nên bản này sẽ bị khựng. Giữ tab hiển thị ở phía trước trong lúc quay — trình duyệt ngưng vẽ khi tab chạy nền.`,
       cheatHtml: `
         <h3>Phím tắt</h3>
         <table>
+          <tr><td>Click vào dải Zoom</td><td>Thêm zoom tại đó. Kéo quét trên dải để tạo đoạn dài đúng bằng khoảng kéo</td></tr>
+          <tr><td>Chuột phải vào khối</td><td>Tách, mức zoom, sao chép, nhân bản, xoá</td></tr>
           <tr><td><kbd>Space</kbd></td><td>Phát / tạm dừng</td></tr>
-          <tr><td><kbd>A</kbd></td><td>Thêm đoạn zoom tại playhead</td></tr>
-          <tr><td><kbd>H</kbd></td><td>Bật / tắt công cụ Làm sáng vùng</td></tr>
+          <tr><td><kbd>A</kbd> / <kbd>H</kbd></td><td>Thêm zoom / vùng sáng tại playhead</td></tr>
+          <tr><td><kbd>X</kbd></td><td>Tách khối đang chọn (hoặc đoạn zoom dưới playhead) tại playhead</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>Z</kbd> / <kbd>Shift</kbd> + <kbd>Cmd</kbd> + <kbd>Z</kbd></td><td>Hoàn tác / làm lại</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>C</kbd> <kbd>V</kbd> <kbd>D</kbd></td><td>Sao chép / dán tại playhead / nhân bản</td></tr>
           <tr><td><kbd>R</kbd></td><td>Lưu video (tua về đầu, phát hết, lưu file), hoặc dừng sớm</td></tr>
-          <tr><td><kbd>V</kbd></td><td>Bật / tắt Xem thử zoom (xem trước mức zoom khi đang chỉnh)</td></tr>
+          <tr><td><kbd>I</kbd> <kbd>O</kbd></td><td>Cắt: cho video bắt đầu / kết thúc tại playhead</td></tr>
+          <tr><td><kbd>V</kbd></td><td>Bật / tắt Xem khung zoom (xem trước mức zoom khi đang chỉnh)</td></tr>
           <tr><td><kbd>[</kbd> <kbd>]</kbd></td><td>Tỷ lệ zoom ±0.1, hoặc độ tối nền vùng sáng ±5%</td></tr>
-          <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Dời playhead một khung hình</td></tr>
-          <tr><td><kbd>Shift</kbd> + <kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Dời playhead một giây</td></tr>
-          <tr><td><kbd>Alt</kbd> + phím mũi tên</td><td>Nhích điểm zoom, nếu trình duyệt cho phép</td></tr>
-          <tr><td><kbd>Delete</kbd></td><td>Xoá đoạn zoom hoặc vùng sáng đang chọn</td></tr>
-          <tr><td><kbd>Esc</kbd></td><td>Huỷ nét đang vẽ, thoát công cụ, bỏ chọn, hoặc đóng bảng này</td></tr>
+          <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Dời playhead một khung hình (<kbd>Shift</kbd>: một giây)</td></tr>
+          <tr><td><kbd>Delete</kbd></td><td>Xoá khối đang chọn</td></tr>
+          <tr><td><kbd>=</kbd> <kbd>-</kbd> <kbd>0</kbd></td><td>Phóng to / thu nhỏ timeline / xem toàn bộ video</td></tr>
+          <tr><td>Chụm hai ngón, <kbd>Ctrl</kbd> + cuộn</td><td>Trên timeline: phóng timeline. Trên video: đổi tỷ lệ của đoạn zoom đang chọn</td></tr>
+          <tr><td>Giữ <kbd>Alt</kbd> khi kéo</td><td>Tắt hút vào cạnh của các mục khác</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>Đóng menu, bỏ chọn, hoặc đóng bảng này</td></tr>
           <tr><td><kbd>?</kbd></td><td>Hiện hoặc ẩn bảng này</td></tr>
         </table>
-        <h3>Ngắm điểm zoom</h3>
-        <p>Chọn một đoạn zoom rồi kéo trên khung hình. Khung nét đứt cho thấy đúng phần sẽ lọt vào frame khi zoom hết cỡ. Kéo bên trong để dời tâm, kéo góc để đổi tỷ lệ zoom. Gần mép frame, khung dừng ở biên dù dấu ngắm vẫn chạy tiếp, vì khi phát video cũng bị giới hạn y như vậy.</p>
-        <h3>Làm sáng vùng</h3>
-        <p>Bật công cụ Làm sáng vùng rồi kéo trên khung hình để vẽ một vùng giữ nguyên độ sáng trong khi phần còn lại bị tối đi. Mỗi vùng sáng là một mục riêng ở làn dưới của timeline, có thời điểm bắt đầu và kết thúc riêng. Kéo khung hoặc các tay cầm để chỉnh hình dạng, dùng Độ tối nền để đặt mức tối cho phần còn lại. Lớp tối nằm trong bản quay; các đường ngắm thì không.</p>
-        <h3>Timeline</h3>
-        <p>Kéo hai đầu đoạn để đổi thời điểm bắt đầu và kết thúc, kéo phần giữa để di chuyển; playhead bám theo đúng cạnh bạn đang kéo, nên bạn thấy ngay khung hình mà hiệu ứng bắt đầu hoặc kết thúc. Khi chọn một mục, video tạm dừng và playhead nhảy vào mục đó. Ngoài mọi đoạn zoom, video giữ nguyên không zoom. Nút Lưu video tự tua về đầu, phát hết ở độ phân giải gốc và tự lưu file.</p>
+        <h3>Mỗi đoạn zoom chỉ có 2 thứ để chỉnh</h3>
+        <p>Zoom sâu bao nhiêu (tỷ lệ, có sẵn nút 1.5× tới 3×) và nhìn vào đâu (kéo chấm trên video). Mỗi đoạn zoom vào ở điểm bắt đầu, giữ nguyên trong số giây bạn đặt, rồi tự trở lại màn hình thường. Cách zoom vào và ra đặt một lần cho cả video ở ô Chuyển động: Mượt, Nhanh, Nảy hoặc Cắt cứng.</p>
+        <h3>Lia từ chỗ này sang chỗ kia</h3>
+        <p>Đặt hai đoạn zoom sát nhau (cạnh tự hút vào nhau, hoặc tách một đoạn bằng <kbd>X</kbd>). Khung hình sẽ trượt từ chỗ thứ nhất sang chỗ thứ hai mà không zoom ra ở giữa. Dấu ⇄ nhỏ đánh dấu chỗ lia.</p>
+        <h3>Vùng sáng</h3>
+        <p>Click vào dải Vùng sáng hoặc bấm <kbd>H</kbd>. Phần còn lại của khung hình tối đi, chỉ khung giữ nguyên độ sáng. Khi đang chọn vùng sáng, kéo khung hoặc tay cầm trên video, hoặc kéo ra ngoài khung để vẽ lại.</p>
+        <h3>Cắt video</h3>
+        <p>Kéo một trong hai đầu màu xanh của dải Video, hoặc bấm <kbd>I</kbd> / <kbd>O</kbd> tại playhead. Nút Phát và Lưu video chỉ chạy phần còn lại. File gốc không bị đụng tới: nút ↺ cạnh tên dải trả lại toàn bộ.</p>
       `,
     },
   };
@@ -419,7 +693,12 @@
   const timeLabel = document.getElementById('timeLabel');
   const resBadge = document.getElementById('resBadge');
   const addSegBtn = document.getElementById('addSegBtn');
-  const highlightBtn = document.getElementById('highlightBtn');
+  const clipEl = document.getElementById('clip');
+  const clipLabel = document.getElementById('clipLabel');
+  const laneGhost = document.getElementById('laneGhost');
+  const ctxMenu = document.getElementById('ctxMenu');
+  const zoomPresets = document.getElementById('zoomPresets');
+  const applyAllBtn = document.getElementById('applyAllBtn');
   const addHighlightBtn = document.getElementById('addHighlightBtn');
   const delSegBtn = document.getElementById('delSegBtn');
   const aimPreviewBtn = document.getElementById('aimPreviewBtn');
@@ -429,10 +708,10 @@
   const highlightControls = document.getElementById('highlightControls');
   const zoomRange = document.getElementById('zoomRange');
   const zoomLabel2 = document.getElementById('zoomLabel2');
-  const zoomInRange = document.getElementById('zoomInRange');
-  const zoomInLabel2 = document.getElementById('zoomInLabel2');
-  const zoomOutRange = document.getElementById('zoomOutRange');
-  const zoomOutLabel2 = document.getElementById('zoomOutLabel2');
+  const fLenLabel = document.getElementById('fLenLabel');
+  const holdHint = document.getElementById('holdHint');
+  const easeRadios = [...document.querySelectorAll('input[name=ease]')];
+  const motionPreviewBtn = document.getElementById('motionPreviewBtn');
   const opacityRange = document.getElementById('opacityRange');
   const opacityLabel2 = document.getElementById('opacityLabel2');
   const selBadge = document.getElementById('selBadge');
@@ -444,6 +723,23 @@
   const cheatSheet = document.getElementById('cheatSheet');
   const cheatBody = document.getElementById('cheatBody');
   const cheatClose = document.getElementById('cheatClose');
+  const trimResetBtn = document.getElementById('trimResetBtn');
+  const trimShadeL = document.getElementById('trimShadeL');
+  const trimShadeR = document.getElementById('trimShadeR');
+  const trimHandleL = document.getElementById('trimHandleL');
+  const trimHandleR = document.getElementById('trimHandleR');
+  const tlViewport = document.getElementById('tlViewport');
+  const ruler = document.getElementById('ruler');
+  const tlZoomRange = document.getElementById('tlZoomRange');
+  const tlInBtn = document.getElementById('tlInBtn');
+  const tlOutBtn = document.getElementById('tlOutBtn');
+  const tlFitBtn = document.getElementById('tlFitBtn');
+  const prevFrameBtn = document.getElementById('prevFrameBtn');
+  const nextFrameBtn = document.getElementById('nextFrameBtn');
+  const fStart = document.getElementById('fStart');
+  const fLen = document.getElementById('fLen');
+  const timeFields = document.getElementById('timeFields');
+  const selEmpty = document.getElementById('selEmpty');
 
   const video = document.createElement('video');
   video.playsInline = true;
@@ -458,7 +754,6 @@
   let segments = [];
   let highlights = [];
   let selection = null;      // { kind: 'zoom' | 'highlight', id } | null
-  let tool = 'zoom';         // 'zoom' | 'highlight' — the active canvas mode
   let aimPreview = false;    // temporarily render the selected segment's settled zoom
   let nextId = 1;
   let lastCrop = null;
@@ -472,11 +767,48 @@
   let lastObjectUrl = null;
   let recFrameCount = 0;
 
+  let trim = { start: 0, end: 0 };   // the part of the video that plays and gets saved
+  let tlZoom = 1;                    // timeline magnification: 1 = whole video fits
+  const TL_PAD = 14;                 // horizontal padding around the timeline track, px
+  const PPS_MAX = 400;               // deepest timeline zoom, pixels per second
+  const SNAP_PX = 8;                 // snapping distance while dragging, px
+  let trimEndTouched = false;        // false while the end still follows the video's full length
+  let trimDrag = null;               // 'start' | 'end' while a trim handle is dragged
+  const MIN_TRIM = 0.2;              // shortest allowed trimmed clip, seconds
+
   const FADE_DUR = 0.15;     // highlight dim-mask fade in/out, seconds
 
   // C2-continuous easing: zero velocity AND zero acceleration at both ends,
   // which removes the small "kick" you get at the start/end of a cubic ease.
   function smootherstep(p) { return p * p * p * (p * (p * 6 - 15) + 10); }
+  // the motion types; each maps 0..1 progress to 0..1 (spring briefly passes 1).
+  // "cut" has no ramp at all; its curve here is only drawn on the option tile.
+  const EASES = {
+    smooth: smootherstep,
+    snappy: (p) => 1 - Math.pow(1 - p, 4),
+    spring: (p) => { const c = 1.6; const q = p - 1; return 1 + (c + 1) * q * q * q + c * q * q; },
+    cut: (p) => (p < 0.5 ? 0 : 1),
+  };
+  // how zooms move is one setting for the whole video, like Screen Studio's animation style
+  // A zoom = zoom in, hold, zoom back out by itself. The in / out moves take a
+  // fixed time, so the only timing you set is how long it holds.
+  const TRANS = 0.5;
+  let motion = { ease: 'smooth' };
+  try { Object.assign(motion, JSON.parse(localStorage.getItem('ztl.motion') || '{}')); } catch (_) { /* defaults */ }
+  if (!EASES[motion.ease]) motion.ease = 'smooth';
+  const curEase = () => EASES[motion.ease] || smootherstep;
+  const transDur = () => (motion.ease === 'cut' ? 0 : TRANS);
+  // how long a zoom stays fully zoomed (pans into it count as part of the hold)
+  function holdOf(s) { const r = zoomRamps(s); return Math.max(0, s.end - s.start - r.rampIn - r.rampOut); }
+  // the length a zoom needs to hold for h seconds, given its neighbours
+  function lenForHold(s, h) { return h + (prevAdj(s) ? 0 : transDur()) + (nextAdj(s) ? 0 : transDur()); }
+  let lastHold = 1.5;          // new zooms hold as long as the last one you set
+  let previewStopAt = null;    // "Try motion" pauses playback here
+  let clipboard = null;        // { kind, data } for copy / paste
+  let lastZoom = 1.8;          // new zooms start at the ratio you used last
+  let lastOpacity = 0.65;
+  let undoStack = [], redoStack = [];
+  const ADJ_EPS = 0.02;        // zooms closer than this count as edge to edge (pan, don't zoom out)
   function lerp(a, b, p) { return a + (b - a) * p; }
   function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
 
@@ -495,33 +827,52 @@
     return s && s.kind === 'zoom' ? s.item : null;
   }
 
+  // the zoom in charge at this time; at a shared edge the later one wins
   function findActiveSegment(time) {
-    for (const s of segments) if (time >= s.start && time <= s.end) return s;
-    return null;
+    let best = null;
+    for (const s of segments) if (time >= s.start && time <= s.end && (!best || s.start > best.start)) best = s;
+    return best;
+  }
+  // zooms placed edge to edge: the view pans between them instead of zooming out
+  function prevAdj(s) { return segments.find(o => o !== s && Math.abs(o.end - s.start) < ADJ_EPS) || null; }
+  function nextAdj(s) { return segments.find(o => o !== s && Math.abs(o.start - s.end) < ADJ_EPS) || null; }
+  function panDur(s) { return Math.min(transDur(), (s.end - s.start) / 2); }
+
+  function zoomRamps(s) {
+    const len = s.end - s.start, T = transDur();
+    let rampIn = prevAdj(s) ? 0 : T, rampOut = nextAdj(s) ? 0 : T;
+    const tot = rampIn + rampOut;
+    if (tot > len) { const k = len / tot; rampIn *= k; rampOut *= k; }
+    return { rampIn, rampOut };
+  }
+
+  // where a zoom really looks once settled: its focus after the frame-edge clamp
+  function settledCenter(s) {
+    const c = cropFor(s.zoom, s.focusX, s.focusY);
+    return { x: (c.sx + c.cropW / 2) / video.videoWidth, y: (c.sy + c.cropH / 2) / video.videoHeight };
   }
 
   function interpolate(time) {
     const s = findActiveSegment(time);
     if (!s) return { zoom: 1, focusX: 0.5, focusY: 0.5 };
-    const len = s.end - s.start;
-    const totalRamp = s.zoomInDur + s.zoomOutDur;
-    let rampIn, rampOut;
-    if (totalRamp > len) {
-      rampIn = totalRamp > 0 ? (s.zoomInDur / totalRamp) * len : len / 2;
-      rampOut = len - rampIn;
-    } else {
-      rampIn = s.zoomInDur;
-      rampOut = s.zoomOutDur;
+    const ez = curEase();
+    // pan from the previous edge-to-edge zoom: ratio and target glide together
+    const p = prevAdj(s), T = panDur(s);
+    if (p && T > 0 && time < s.start + T) {
+      const k = ez((time - s.start) / T);
+      const a = settledCenter(p), b = settledCenter(s);
+      return { zoom: Math.pow(p.zoom, 1 - k) * Math.pow(s.zoom, k), focusX: lerp(a.x, b.x, k), focusY: lerp(a.y, b.y, k) };
     }
+    const { rampIn, rampOut } = zoomRamps(s);
     // zoom is interpolated geometrically (Math.pow), not linearly: perceived zoom
     // speed is multiplicative, so this is what actually reads as "constant speed".
-    if (time < s.start + rampIn) {
-      const p = rampIn > 0 ? smootherstep((time - s.start) / rampIn) : 1;
-      return { zoom: Math.pow(s.zoom, p), focusX: s.focusX, focusY: s.focusY };
+    if (rampIn > 0 && time < s.start + rampIn) {
+      const q = ez((time - s.start) / rampIn);
+      return { zoom: Math.pow(s.zoom, q), focusX: s.focusX, focusY: s.focusY };
     }
-    if (time > s.end - rampOut) {
-      const p = rampOut > 0 ? smootherstep((time - (s.end - rampOut)) / rampOut) : 1;
-      return { zoom: Math.pow(s.zoom, 1 - p), focusX: s.focusX, focusY: s.focusY };
+    if (rampOut > 0 && time > s.end - rampOut) {
+      const q = ez((time - (s.end - rampOut)) / rampOut);
+      return { zoom: Math.pow(s.zoom, 1 - q), focusX: s.focusX, focusY: s.focusY };
     }
     return { zoom: s.zoom, focusX: s.focusX, focusY: s.focusY };
   }
@@ -627,24 +978,18 @@
       }
     }
 
+    // the target dot you drag, like Screen Studio's
     const ret = sourcePointToCanvas(s.focusX * vw, s.focusY * vh);
     if (ret) {
-      const r = 9 * dpr;
+      const r = 10 * dpr;
       c.save();
-      c.lineWidth = 4 * dpr;
-      c.strokeStyle = 'rgba(0,0,0,0.55)';
-      c.beginPath();
-      c.moveTo(ret.x - r, ret.y); c.lineTo(ret.x + r, ret.y);
-      c.moveTo(ret.x, ret.y - r); c.lineTo(ret.x, ret.y + r);
-      c.stroke();
-      c.beginPath(); c.arc(ret.x, ret.y, r * 0.72, 0, Math.PI * 2); c.stroke();
-      c.lineWidth = 2 * dpr;
-      c.strokeStyle = 'rgba(77,163,255,0.95)';
-      c.beginPath();
-      c.moveTo(ret.x - r, ret.y); c.lineTo(ret.x + r, ret.y);
-      c.moveTo(ret.x, ret.y - r); c.lineTo(ret.x, ret.y + r);
-      c.stroke();
-      c.beginPath(); c.arc(ret.x, ret.y, r * 0.72, 0, Math.PI * 2); c.stroke();
+      c.beginPath(); c.arc(ret.x, ret.y, r + 3 * dpr, 0, Math.PI * 2);
+      c.fillStyle = 'rgba(77,163,255,0.25)'; c.fill();
+      c.beginPath(); c.arc(ret.x, ret.y, r, 0, Math.PI * 2);
+      c.fillStyle = 'rgba(77,163,255,0.95)'; c.fill();
+      c.lineWidth = 2.5 * dpr; c.strokeStyle = '#fff'; c.stroke();
+      c.beginPath(); c.arc(ret.x, ret.y, 3 * dpr, 0, Math.PI * 2);
+      c.fillStyle = '#fff'; c.fill();
       c.restore();
     }
   }
@@ -693,8 +1038,23 @@
     c.restore();
   }
 
+  // playback never runs past the trimmed end; a take in progress stops there too.
+  // Called from the draw loop, from timeupdate and from the video-frame callback
+  // chain below, so a throttled background tab still stops on time.
+  function enforceTrim() {
+    if (previewStopAt !== null && !video.paused && video.currentTime >= previewStopAt) {
+      previewStopAt = null;
+      video.pause();
+      return;
+    }
+    if (video.paused || !(trim.end > 0) || video.currentTime < trim.end) return;
+    if (recorder && recorder.state === 'recording') stopRecording();
+    else video.pause();
+  }
+
   function draw() {
     if (!video.videoWidth) return;
+    enforceTrim();
     const recCrop = computeCrop();
     const sel = selectedItem();
     const viewCrop = (aimPreview && sel && sel.kind === 'zoom') ? settledCrop(sel.item) : recCrop;
@@ -717,9 +1077,13 @@
       recTime.textContent = ((performance.now() - recStartedAt) / 1000).toFixed(1) + 's';
     }
 
-    // overlays below are preview only — never drawn into the recording
-    if (tool === 'zoom' && sel && sel.kind === 'zoom') drawZoomOverlay(ctx);
-    if (tool === 'highlight') {
+    // overlays below are preview only — never drawn into the recording.
+    // What you can edit on the frame follows the selection: a zoom shows its
+    // target dot and box, a highlight shows its handles.
+    // While playing, show the clean video: guides only appear when paused.
+    if (!video.paused) return;
+    if (sel && sel.kind === 'zoom') drawZoomOverlay(ctx);
+    if (sel && sel.kind === 'highlight') {
       drawHighlightHandles(ctx);
       if (canvasDrag && canvasDrag.type === 'hl-create') drawPendingHighlight(ctx);
     }
@@ -760,6 +1124,7 @@
   video.addEventListener('loadedmetadata', () => {
     const vw = video.videoWidth, vh = video.videoHeight;
     stage.style.setProperty('--ar', vw + ' / ' + vh);
+    stage.style.setProperty('--arn', String(vw / vh));
     recCanvas.width = vw; recCanvas.height = vh;
     resBadge.textContent = t('canvasBadge')(vw, vh);
     resizeCanvasToStage();
@@ -768,12 +1133,18 @@
     highlights = [];
     selection = null;
     aimPreview = false;
+    trim = { start: 0, end: video.duration || 0 };
+    trimEndTouched = false;
+    undoStack = []; redoStack = [];
+    [prevFrameBtn, nextFrameBtn, tlZoomRange, tlInBtn, tlOutBtn, tlFitBtn]
+      .forEach(el => el.disabled = false);
+    tlZoom = 1;
+    layoutTimeline();
     playBtn.disabled = false;
     addSegBtn.disabled = false;
-    highlightBtn.disabled = false;
     addHighlightBtn.disabled = false;
     recordBtn.disabled = false;
-    setTool('zoom');
+    refreshCanvasChrome();
     updateContextualControls();
     updateTimeline();
     updateSelectionUI();
@@ -783,21 +1154,45 @@
   video.addEventListener('play', () => {
     playBtn.textContent = t('pause');
     if (aimPreview) setAimPreview(false);
+    refreshCanvasChrome();
     startLoop();
+    if (typeof video.requestVideoFrameCallback === 'function') {
+      const tick = () => {
+        if (video.paused) return;
+        enforceTrim();
+        if (!video.paused) video.requestVideoFrameCallback(tick);
+      };
+      video.requestVideoFrameCallback(tick);
+    }
   });
-  video.addEventListener('pause', () => { playBtn.textContent = t('play'); stopLoop(); });
+  video.addEventListener('pause', () => {
+    previewStopAt = null; playBtn.textContent = t('play'); refreshCanvasChrome(); stopLoop(); });
   video.addEventListener('ended', () => {
     playBtn.textContent = t('play');
+    refreshCanvasChrome();
     stopLoop();
     if (recorder && recorder.state === 'recording') stopRecording();
   });
+  // some files report a provisional length at loadedmetadata and the real one later;
+  // while the end hasn't been trimmed by hand, keep it glued to the full length
+  video.addEventListener('durationchange', () => {
+    if (!trimEndTouched && isFinite(video.duration)) { trim.end = video.duration; updateTrimUI(); }
+  });
   video.addEventListener('seeked', draw);
   video.addEventListener('timeupdate', () => {
+    enforceTrim();
     timeLabel.textContent = `${video.currentTime.toFixed(2)} / ${(video.duration || 0).toFixed(2)}s`;
     updatePlayheadPosition();
   });
 
-  playBtn.addEventListener('click', () => { if (video.paused) video.play(); else video.pause(); });
+  // play always stays inside the trimmed range: from the start if the playhead is
+  // outside it or already at its end
+  function togglePlay() {
+    if (!video.paused) { video.pause(); return; }
+    if (video.currentTime < trim.start || video.currentTime >= trim.end - 0.05) video.currentTime = trim.start;
+    video.play();
+  }
+  playBtn.addEventListener('click', togglePlay);
   pickBtn.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', (e) => loadFile(e.target.files[0]));
 
@@ -811,15 +1206,15 @@
 
   // ---- Tool / contextual UI ----
   function refreshCanvasChrome() {
-    canvas.classList.toggle('hl-cursor', tool === 'highlight');
-    canvas.classList.toggle('focus-cursor', tool === 'zoom' && !!selectedZoom());
-    canvasHint.textContent = video.videoWidth ? t(tool === 'highlight' ? 'hintDrawHl' : 'hintAimZoom') : '';
-  }
-  function setTool(name) {
-    tool = name;
-    highlightBtn.classList.toggle('active', name === 'highlight');
-    refreshCanvasChrome();
-    if (video.paused) draw();
+    const it = selectedItem();
+    canvas.classList.toggle('hl-cursor', !!it && it.kind === 'highlight');
+    canvas.classList.toggle('focus-cursor', !!it && it.kind === 'zoom');
+    let hint = '';
+    if (video.videoWidth && video.paused) {
+      if (it) hint = t(it.kind === 'zoom' ? 'hintAimZoom' : 'hintEditHl');
+      else if (!segments.length) hint = t('hintEmpty');
+    }
+    canvasHint.textContent = hint;
   }
   function setAimPreview(on) {
     aimPreview = !!on;
@@ -837,9 +1232,210 @@
     const isHl = !!it && it.kind === 'highlight';
     zoomControls.hidden = !isZoom;
     highlightControls.hidden = !isHl;
-    [zoomRange, zoomInRange, zoomOutRange].forEach(el => el.disabled = !isZoom);
+    zoomRange.disabled = !isZoom;
     opacityRange.disabled = !isHl;
+    motionPreviewBtn.disabled = !segments.length;
     delSegBtn.disabled = !it;
+    delSegBtn.hidden = !it;
+    timeFields.hidden = !it;
+    selEmpty.hidden = !!it;
+  }
+
+  // ---- Trim ----
+  // the Video lane: a clip bar from trim.start to trim.end whose ends you drag
+  function updateTrimUI() {
+    const dur = video.duration || 0;
+    if (!dur || !isFinite(dur)) { clipEl.hidden = true; trimResetBtn.hidden = true; return; }
+    clipEl.hidden = false;
+    const a = (trim.start / dur) * 100, b = (trim.end / dur) * 100;
+    trimShadeL.style.width = a + '%';
+    trimShadeR.style.width = (100 - b) + '%';
+    trimHandleL.style.left = a + '%';
+    trimHandleR.style.left = b + '%';
+    clipEl.style.left = a + '%';
+    clipEl.style.width = (b - a) + '%';
+    const trimmed = trim.start > 0.001 || trim.end < dur - 0.001;
+    clipLabel.textContent = t('clipLabel')(trim.start, trim.end, !trimmed);
+    trimResetBtn.hidden = !trimmed;
+  }
+  function setTrimIn() {
+    if (!video.duration) return;
+    checkpoint();
+    trim.start = clamp(video.currentTime, 0, trim.end - MIN_TRIM);
+    updateTrimUI();
+  }
+  function setTrimOut() {
+    if (!video.duration) return;
+    checkpoint();
+    trim.end = clamp(video.currentTime, trim.start + MIN_TRIM, video.duration);
+    trimEndTouched = true;
+    updateTrimUI();
+  }
+  function resetTrim() {
+    checkpoint();
+    trim = { start: 0, end: video.duration || 0 };
+    trimEndTouched = false;
+    updateTrimUI();
+  }
+  trimResetBtn.addEventListener('click', resetTrim);
+
+  // drag a handle: the playhead sticks to it, so the preview shows the exact first / last frame kept
+  function beginTrimDrag(edge, e) {
+    if (!video.duration || e.button !== 0) return;
+    e.stopPropagation(); e.preventDefault();
+    if (!video.paused) video.pause();
+    checkpoint();
+    trimDrag = edge;
+    (edge === 'start' ? trimHandleL : trimHandleR).classList.add('active');
+    window.addEventListener('pointermove', onTrimDragMove);
+    window.addEventListener('pointerup', onTrimDragEnd);
+  }
+  function onTrimDragMove(e) {
+    if (!trimDrag) return;
+    const rect = timeline.getBoundingClientRect();
+    const dur = video.duration || 0;
+    let tm = clamp((e.clientX - rect.left) / rect.width, 0, 1) * dur;
+    if (!e.altKey) {
+      const sn = snapTo(tm, [0, dur, ...segments.flatMap(x => [x.start, x.end]), ...highlights.flatMap(x => [x.start, x.end])]);
+      if (sn !== null) tm = sn;
+    }
+    if (trimDrag === 'start') trim.start = clamp(tm, 0, trim.end - MIN_TRIM);
+    else { trim.end = clamp(tm, trim.start + MIN_TRIM, dur); trimEndTouched = true; }
+    video.currentTime = trimDrag === 'start' ? trim.start : trim.end;
+    updateTrimUI();
+    draw();
+  }
+  function onTrimDragEnd() {
+    trimDrag = null;
+    dropIfUnchanged();
+    trimHandleL.classList.remove('active');
+    trimHandleR.classList.remove('active');
+    window.removeEventListener('pointermove', onTrimDragMove);
+    window.removeEventListener('pointerup', onTrimDragEnd);
+  }
+  trimHandleL.addEventListener('pointerdown', (e) => beginTrimDrag('start', e));
+  trimHandleR.addEventListener('pointerdown', (e) => beginTrimDrag('end', e));
+
+  // ---- Timeline zoom, ruler, follow ----
+  function timelinePps() {
+    const dur = video.duration || 0;
+    return dur ? timeline.clientWidth / dur : 0;
+  }
+  function tlMaxZoom() {
+    const dur = video.duration || 0;
+    const base = Math.max(1, tlViewport.clientWidth - TL_PAD * 2);
+    return isFinite(dur) && dur > 0 ? Math.max(1, (dur * PPS_MAX) / base) : 1;
+  }
+  // size the track for the current magnification; positions inside stay in %
+  function layoutTimeline() {
+    const base = Math.max(1, tlViewport.clientWidth - TL_PAD * 2);
+    tlZoom = clamp(tlZoom, 1, tlMaxZoom());
+    timeline.style.width = Math.round(base * tlZoom) + 'px';
+    const max = tlMaxZoom();
+    tlZoomRange.value = max > 1 ? Math.log(tlZoom) / Math.log(max) : 0;
+    renderRuler();
+    updateTimeline();
+  }
+  // zoom around a screen x (the pointer), or around the playhead when none is given
+  function setTlZoom(z, anchorClientX) {
+    const dur = video.duration || 0;
+    if (!dur || !isFinite(dur)) return;
+    const vpRect = tlViewport.getBoundingClientRect();
+    let anchorX, anchorT;
+    if (anchorClientX === undefined) {
+      anchorT = video.currentTime;
+      const px = TL_PAD + (anchorT / dur) * timeline.clientWidth - tlViewport.scrollLeft;
+      anchorX = clamp(px, 0, tlViewport.clientWidth);
+    } else {
+      anchorX = anchorClientX - vpRect.left;
+      anchorT = clamp((tlViewport.scrollLeft + anchorX - TL_PAD) / timeline.clientWidth, 0, 1) * dur;
+    }
+    tlZoom = z;
+    layoutTimeline();
+    tlViewport.scrollLeft = TL_PAD + (anchorT / dur) * timeline.clientWidth - anchorX;
+  }
+  function niceStep(pps) {
+    const steps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 30, 60, 120, 300, 600];
+    for (const st of steps) if (st * pps >= 64) return st;
+    return steps[steps.length - 1];
+  }
+  function fmtTick(sec, step) {
+    if (sec >= 60) {
+      const m = Math.floor(sec / 60), r = sec - m * 60;
+      return m + ':' + (step < 1 ? r.toFixed(1).padStart(4, '0') : String(Math.round(r)).padStart(2, '0'));
+    }
+    return (step < 1 ? sec.toFixed(1) : String(Math.round(sec))) + 's';
+  }
+  function renderRuler() {
+    ruler.textContent = '';
+    const dur = video.duration || 0;
+    const pps = timelinePps();
+    if (!dur || !isFinite(dur) || !pps) return;
+    const step = niceStep(pps), minor = step / 5;
+    const frag = document.createDocumentFragment();
+    const n = Math.floor(dur / minor + 1e-6);
+    for (let i = 0; i <= n; i++) {
+      const sec = i * minor;
+      const el = document.createElement('div');
+      const major = i % 5 === 0;
+      el.className = 'tick' + (major ? ' major' : '');
+      el.style.left = (TL_PAD + sec * pps) + 'px';
+      if (major) {
+        const lab = document.createElement('span');
+        lab.textContent = fmtTick(sec, step);
+        el.appendChild(lab);
+      }
+      frag.appendChild(el);
+    }
+    ruler.appendChild(frag);
+  }
+  // keep the playhead on screen while playing or stepping (not while dragging)
+  function ensurePlayheadVisible() {
+    if (dragMode || trimDrag || scrubbing || tlZoom <= 1.001) return;
+    const dur = video.duration || 0;
+    if (!dur) return;
+    const x = TL_PAD + (video.currentTime / dur) * timeline.clientWidth;
+    const left = tlViewport.scrollLeft, w = tlViewport.clientWidth;
+    if (x < left + 20 || x > left + w - 20) tlViewport.scrollLeft = x - w * 0.15;
+  }
+
+  tlViewport.addEventListener('wheel', (e) => {
+    if (!video.duration) return;
+    if (e.ctrlKey || e.metaKey) {           // trackpad pinch arrives as ctrl + wheel
+      e.preventDefault();
+      setTlZoom(tlZoom * Math.exp(-e.deltaY * 0.01), e.clientX);
+      return;
+    }
+    // plain vertical scroll pans along a zoomed timeline; horizontal swipes pan natively
+    if (tlZoom > 1.001 && !e.shiftKey && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      e.preventDefault();
+      tlViewport.scrollLeft += e.deltaY;
+    }
+  }, { passive: false });
+  // Safari reports trackpad pinch as gesture events instead
+  let gestureBase = 1;
+  tlViewport.addEventListener('gesturestart', (e) => { e.preventDefault(); gestureBase = tlZoom; });
+  tlViewport.addEventListener('gesturechange', (e) => { e.preventDefault(); setTlZoom(gestureBase * e.scale, e.clientX); });
+  tlZoomRange.addEventListener('input', () => setTlZoom(Math.pow(tlMaxZoom(), parseFloat(tlZoomRange.value))));
+  tlInBtn.addEventListener('click', () => setTlZoom(tlZoom * 1.6));
+  tlOutBtn.addEventListener('click', () => setTlZoom(tlZoom / 1.6));
+  tlFitBtn.addEventListener('click', () => setTlZoom(1));
+  new ResizeObserver(() => { if (video.duration) layoutTimeline(); }).observe(tlViewport);
+
+  // ---- Snapping ----
+  function snapCandidates(skipKind, skipId) {
+    const out = [0, video.duration || 0, trim.start, trim.end];
+    for (const s of segments) if (!(skipKind === 'zoom' && s.id === skipId)) out.push(s.start, s.end);
+    for (const h of highlights) if (!(skipKind === 'highlight' && h.id === skipId)) out.push(h.start, h.end);
+    return out;
+  }
+  // nearest candidate within SNAP_PX, or null
+  function snapTo(t, cands) {
+    const pps = timelinePps();
+    if (!pps) return null;
+    let best = null, bd = SNAP_PX / pps;
+    for (const c of cands) { const d = Math.abs(c - t); if (d < bd) { bd = d; best = c; } }
+    return best;
   }
 
   // ---- Timeline ----
@@ -855,40 +1451,73 @@
 
     const fill = document.createElement('div');
     fill.className = 'seg-fill';
-    fill.addEventListener('pointerdown', (e) => {
-      e.stopPropagation(); selectItem(kind, item.id); beginDrag('move', kind, item, e);
-    });
+    if (kind === 'zoom') {
+      // trapezoid: rising edge = zoom in, flat top = hold, falling edge = zoom out
+      const { rampIn, rampOut } = zoomRamps(item);
+      const len = item.end - item.start || 1;
+      const a = (rampIn / len) * 100, b = 100 - (rampOut / len) * 100;
+      const ez = curEase(), N = 16, pts = ['0,100'];
+      const y = (lvl) => clamp(100 - 88 * lvl, 2, 100).toFixed(1);
+      for (let i = 0; i <= N; i++) pts.push((a * i / N).toFixed(2) + ',' + y(ez(i / N)));
+      for (let i = 0; i <= N; i++) pts.push((b + (100 - b) * i / N).toFixed(2) + ',' + y(1 - ez(i / N)));
+      pts.push('100,100');
+      fill.innerHTML = `<svg viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="${pts.join(' ')}"/></svg>`;
+      const pps = timelinePps();
+      if ((item.end - item.start) * pps > 44) {
+        const lab = document.createElement('span');
+        lab.className = 'seg-label';
+        lab.textContent = item.zoom.toFixed(1) + '×' + ((item.end - item.start) * pps > 90 ? ' · ' + holdOf(item).toFixed(1) + 's' : '');
+        fill.appendChild(lab);
+      }
+    }
+    // left button drags; any button selects (so a right-click menu acts on this block)
+    const grab = (mode) => (e) => {
+      e.stopPropagation(); hideGhost();
+      selectItem(kind, item.id);
+      if (e.button === 0) beginDrag(mode, kind, item, e);
+    };
+    fill.addEventListener('pointerdown', grab('move'));
 
     const leftH = document.createElement('div');
     leftH.className = 'seg-handle left';
-    leftH.addEventListener('pointerdown', (e) => {
-      e.stopPropagation(); selectItem(kind, item.id); beginDrag('resize-start', kind, item, e);
-    });
+    leftH.addEventListener('pointerdown', grab('resize-start'));
 
     const rightH = document.createElement('div');
     rightH.className = 'seg-handle right';
-    rightH.addEventListener('pointerdown', (e) => {
-      e.stopPropagation(); selectItem(kind, item.id); beginDrag('resize-end', kind, item, e);
-    });
+    rightH.addEventListener('pointerdown', grab('resize-end'));
 
     el.append(fill, leftH, rightH);
     return el;
   }
 
   function updateTimeline() {
-    timeline.querySelectorAll('.segment').forEach(el => el.remove());
+    timeline.querySelectorAll('.segment, .seam').forEach(el => el.remove());
     segments.forEach(s => timeline.appendChild(makeTimelineItem(s, 'zoom')));
     highlights.forEach(h => timeline.appendChild(makeTimelineItem(h, 'highlight')));
+    // mark every edge-to-edge pair: the view pans there instead of zooming out
+    const dur = video.duration || 0;
+    if (dur) for (const s of segments) {
+      if (!prevAdj(s)) continue;
+      const m = document.createElement('div');
+      m.className = 'seam';
+      m.textContent = '⇄';
+      m.style.left = (s.start / dur) * 100 + '%';
+      timeline.appendChild(m);
+    }
+    updateTrimUI();
     updatePlayheadPosition();
+    motionPreviewBtn.disabled = !segments.length;
   }
 
   function updatePlayheadPosition() {
     const dur = video.duration || 0;
     playhead.style.left = (dur ? (video.currentTime / dur) * 100 : 0) + '%';
+    ensurePlayheadVisible();
   }
 
   function beginDrag(mode, itemKind, item, e) {
     if (!video.paused) video.pause();
+    checkpoint();
     // where the playhead sat inside the item when the drag began, so a "move"
     // can keep showing the same relative frame as the block slides
     const grabOffset = clamp(video.currentTime - item.start, 0, item.end - item.start);
@@ -904,14 +1533,23 @@
     const dur = video.duration || 0;
     const deltaTime = ((e.clientX - dragMode.startClientX) / rect.width) * dur;
     const MIN_LEN = 0.1;
+    const cands = e.altKey ? [] : snapCandidates(dragMode.itemKind, dragMode.id);
     if (dragMode.mode === 'move') {
       const len = dragMode.origEnd - dragMode.origStart;
-      const newStart = clamp(dragMode.origStart + deltaTime, 0, Math.max(0, dur - len));
+      let newStart = dragMode.origStart + deltaTime;
+      const a = snapTo(newStart, cands), b = snapTo(newStart + len, cands);
+      if (a !== null && (b === null || Math.abs(a - newStart) <= Math.abs(b - newStart - len))) newStart = a;
+      else if (b !== null) newStart = b - len;
+      newStart = clamp(newStart, 0, Math.max(0, dur - len));
       s.start = newStart; s.end = newStart + len;
     } else if (dragMode.mode === 'resize-start') {
-      s.start = clamp(dragMode.origStart + deltaTime, 0, dragMode.origEnd - MIN_LEN);
+      let v = dragMode.origStart + deltaTime;
+      const sn = snapTo(v, cands); if (sn !== null) v = sn;
+      s.start = clamp(v, 0, dragMode.origEnd - MIN_LEN);
     } else if (dragMode.mode === 'resize-end') {
-      s.end = clamp(dragMode.origEnd + deltaTime, dragMode.origStart + MIN_LEN, dur);
+      let v = dragMode.origEnd + deltaTime;
+      const sn = snapTo(v, cands); if (sn !== null) v = sn;
+      s.end = clamp(v, dragMode.origStart + MIN_LEN, dur);
     }
     // pin the playhead to whatever you're dragging: the end edge, the start
     // edge, or (when moving the whole block) the same spot inside it — so the
@@ -926,34 +1564,158 @@
     draw();
   }
   function onDragEnd() {
+    if (dragMode && dragMode.itemKind === 'zoom' && dragMode.mode !== 'move') {
+      const s = findItem('zoom', dragMode.id);
+      if (s) lastHold = holdOf(s);
+    }
     dragMode = null;
     window.removeEventListener('pointermove', onDragMove);
     window.removeEventListener('pointerup', onDragEnd);
+    dropIfUnchanged();
+    updateTimeline();
     if (video.paused) draw();
   }
 
+  // ---- Lanes: ruler and Video lane scrub; the Zoom / Highlight lanes create ----
+  const LANE_ZOOM = [56, 92], LANE_HL = [92, 128];
+  function laneAt(clientY) {
+    const y = clientY - timeline.getBoundingClientRect().top;
+    if (y >= LANE_ZOOM[0] && y < LANE_ZOOM[1]) return 'zoom';
+    if (y >= LANE_HL[0] && y < LANE_HL[1]) return 'highlight';
+    return null;
+  }
+  function timeAtClientX(clientX) {
+    const rect = timeline.getBoundingClientRect();
+    return clamp((clientX - rect.left) / rect.width, 0, 1) * (video.duration || 0);
+  }
+  // the empty stretch of a lane around time tm: [prev item end, next item start]
+  function laneGap(kind, tm) {
+    const arr = kind === 'zoom' ? segments : highlights;
+    let lo = 0, hi = video.duration || 0;
+    for (const x of arr) {
+      if (x.end <= tm + 1e-6) lo = Math.max(lo, x.end);
+      if (x.start >= tm - 1e-6) hi = Math.min(hi, x.start);
+    }
+    return { lo, hi };
+  }
+  const DEFAULT_LEN = (kind) => kind === 'zoom'
+    ? lastHold + 2 * transDur()
+    : Math.min(2, Math.max(0.5, (video.duration || 0) * 0.2));
+  // where a click at tm would put a new block: snapped onto a neighbour's edge, kept inside the gap
+  function proposedSpan(kind, tm, alt) {
+    const { lo, hi } = laneGap(kind, tm);
+    let start = tm;
+    if (!alt) { const sn = snapTo(start, [lo, trim.start]); if (sn !== null) start = sn; }
+    start = clamp(start, lo, hi);
+    let end = Math.min(hi, start + DEFAULT_LEN(kind));
+    if (end - start < 0.3) { start = Math.max(lo, end - DEFAULT_LEN(kind)); }
+    return end - start >= 0.15 ? { start, end } : null;
+  }
+  function showGhost(kind, span, pending) {
+    const dur = video.duration || 0;
+    if (!span || !dur) { hideGhost(); return; }
+    laneGhost.hidden = false;
+    laneGhost.className = 'lane-ghost' + (kind === 'highlight' ? ' hl' : '') + (pending ? ' pending' : '');
+    laneGhost.style.top = (kind === 'zoom' ? 61 : 97) + 'px';
+    laneGhost.style.left = (span.start / dur) * 100 + '%';
+    laneGhost.style.width = ((span.end - span.start) / dur) * 100 + '%';
+    laneGhost.textContent = pending ? '' : '+';
+  }
+  function hideGhost() { laneGhost.hidden = true; }
+
+  function createItem(kind, start, end) {
+    checkpoint();
+    if (kind === 'zoom') {
+      const s = { id: nextId++, start, end, zoom: lastZoom, focusX: 0.5, focusY: 0.5 };
+      segments.push(s);
+      segments.sort((a, b) => a.start - b.start);
+      updateTimeline();
+      selectItem('zoom', s.id);
+      return s;
+    }
+    const h = { id: nextId++, start, end, x: 0.3, y: 0.3, w: 0.4, h: 0.4, opacity: lastOpacity };
+    highlights.push(h);
+    highlights.sort((a, b) => a.start - b.start);
+    updateTimeline();
+    selectItem('highlight', h.id);
+    return h;
+  }
+
+  let laneDrag = null;   // { kind, t0, x0, lo, hi, moved }
   timeline.addEventListener('pointerdown', (e) => {
-    if (e.target !== timeline && e.target !== playhead) return;
-    scrubbing = true;
-    seekFromClientX(e.clientX);
+    if (!video.duration) return;
+    hideCtxMenu();
+    const lane = laneAt(e.clientY);
+    const empty = e.target === timeline || e.target === laneGhost;
+    if (lane && empty) {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      const tm = timeAtClientX(e.clientX);
+      const { lo, hi } = laneGap(lane, tm);
+      if (hi - lo < 0.15) return;
+      laneDrag = { kind: lane, t0: clamp(tm, lo, hi), x0: e.clientX, lo, hi, moved: false, alt: e.altKey };
+      return;
+    }
+    if (e.target === timeline || e.target === playhead || e.target === ruler || e.target === clipEl || e.target === clipLabel) {
+      if (e.button !== 0) return;
+      scrubbing = true;
+      seekFromClientX(e.clientX);
+    }
   });
-  window.addEventListener('pointermove', (e) => { if (scrubbing) seekFromClientX(e.clientX); });
-  window.addEventListener('pointerup', () => { scrubbing = false; });
+  window.addEventListener('pointermove', (e) => {
+    if (scrubbing) { seekFromClientX(e.clientX); return; }
+    if (laneDrag) {
+      if (Math.abs(e.clientX - laneDrag.x0) > 4) laneDrag.moved = true;
+      if (!laneDrag.moved) return;
+      const span = laneDragSpan(e);
+      showGhost(laneDrag.kind, span, true);
+      video.currentTime = span.end;
+    }
+  });
+  function laneDragSpan(e) {
+    let tm = clamp(timeAtClientX(e.clientX), laneDrag.lo, laneDrag.hi);
+    let t0 = laneDrag.t0;
+    if (!e.altKey) {
+      const c = snapCandidates();
+      const a = snapTo(t0, c); if (a !== null) t0 = clamp(a, laneDrag.lo, laneDrag.hi);
+      const b = snapTo(tm, c); if (b !== null) tm = clamp(b, laneDrag.lo, laneDrag.hi);
+    }
+    return { start: Math.min(t0, tm), end: Math.max(t0, tm) };
+  }
+  window.addEventListener('pointerup', (e) => {
+    scrubbing = false;
+    if (!laneDrag) return;
+    const d = laneDrag;
+    let span;
+    if (d.moved) {
+      span = laneDragSpan(e);
+      if (span.end - span.start < 0.15) span = null;
+    } else {
+      span = proposedSpan(d.kind, d.t0, d.alt);
+    }
+    laneDrag = null;
+    hideGhost();
+    if (span) createItem(d.kind, span.start, span.end);
+  });
+  // hover preview: a dashed "+" block shows where a click would add one
+  timeline.addEventListener('pointermove', (e) => {
+    if (laneDrag || scrubbing || dragMode || trimDrag || !video.duration) return;
+    const lane = laneAt(e.clientY);
+    if (!lane || (e.target !== timeline && e.target !== laneGhost)) { hideGhost(); return; }
+    showGhost(lane, proposedSpan(lane, timeAtClientX(e.clientX), e.altKey), false);
+  });
+  timeline.addEventListener('pointerleave', () => { if (!laneDrag) hideGhost(); });
 
   function seekFromClientX(clientX) {
-    const rect = timeline.getBoundingClientRect();
-    const pct = clamp((clientX - rect.left) / rect.width, 0, 1);
-    video.currentTime = pct * (video.duration || 0);
+    video.currentTime = timeAtClientX(clientX);
   }
 
   // A representative moment inside an item: for a zoom, the point where it has
-  // finished ramping in; for a highlight, just past its fade-in.
+  // finished ramping (or panning) in; for a highlight, just past its fade-in.
   function itemPreviewTime(kind, item) {
     if (kind === 'zoom') {
-      const len = item.end - item.start;
-      const totalRamp = item.zoomInDur + item.zoomOutDur;
-      const rampIn = totalRamp > len ? (item.zoomInDur / (totalRamp || 1)) * len : item.zoomInDur;
-      return clamp(item.start + rampIn, item.start, item.end);
+      const lead = prevAdj(item) ? panDur(item) : zoomRamps(item).rampIn;
+      return clamp(item.start + lead, item.start, item.end);
     }
     return clamp(item.start + Math.min(FADE_DUR * 2, (item.end - item.start) / 2), item.start, item.end);
   }
@@ -973,13 +1735,8 @@
     const item = findItem(kind, id);
     if (!item) return;
     selection = { kind, id };
-    if (kind === 'zoom') {
-      zoomRange.value = item.zoom;
-      zoomInRange.value = item.zoomInDur;
-      zoomOutRange.value = item.zoomOutDur;
-    } else {
-      opacityRange.value = item.opacity;
-    }
+    if (kind === 'zoom') zoomRange.value = item.zoom;
+    else opacityRange.value = item.opacity;
     updateContextualControls();
     updateTimeline();
     updateSelectionUI();
@@ -999,9 +1756,19 @@
 
   function updateSelectionUI() {
     const it = selectedItem();
+    holdHint.textContent = '';
+    if (it) {
+      const fmt = (v) => v.toFixed(1);
+      const isZoom = it.kind === 'zoom';
+      fStart.previousElementSibling.textContent = t(isZoom ? 'fStart' : 'fStartHl');
+      fLenLabel.textContent = t(isZoom ? 'fHold' : 'fLen');
+      if (document.activeElement !== fStart) fStart.value = fmt(it.item.start);
+      if (document.activeElement !== fLen) fLen.value = fmt(isZoom ? holdOf(it.item) : it.item.end - it.item.start);
+      if (isZoom) holdHint.textContent = t('holdHint')(it.item.start, it.item.end);
+    }
     if (!it) {
-      selBadge.textContent = t('noneSelected');
-      zoomLabel2.textContent = zoomInLabel2.textContent = zoomOutLabel2.textContent = '';
+      selBadge.textContent = '';
+      zoomLabel2.textContent = '';
       opacityLabel2.textContent = '';
       return;
     }
@@ -1009,8 +1776,7 @@
       const s = it.item;
       selBadge.textContent = t('segBadge')(s);
       zoomLabel2.textContent = s.zoom.toFixed(2) + '×';
-      zoomInLabel2.textContent = s.zoomInDur.toFixed(1) + 's';
-      zoomOutLabel2.textContent = s.zoomOutDur.toFixed(1) + 's';
+      zoomPresets.querySelectorAll('button').forEach(b => b.classList.toggle('on', Math.abs(parseFloat(b.dataset.z) - s.zoom) < 0.01));
     } else {
       const h = it.item;
       selBadge.textContent = t('hlBadge')(h);
@@ -1018,57 +1784,317 @@
     }
   }
 
-  function defaultSpan() {
-    const dur = video.duration || 0;
-    const start = video.currentTime;
-    const len = Math.min(2, Math.max(0.5, dur * 0.2));
-    return { start, end: clamp(start + len, start + 0.5, dur) };
+  // A / H and the lane-name buttons: add at the playhead, in the free space there
+  function addAtPlayhead(kind) {
+    const span = proposedSpan(kind, video.currentTime, true);
+    if (span) createItem(kind, span.start, span.end);
   }
-
-  addSegBtn.addEventListener('click', () => {
-    const { start, end } = defaultSpan();
-    const s = { id: nextId++, start, end, zoom: 1.8, focusX: 0.5, focusY: 0.5, zoomInDur: 0.6, zoomOutDur: 0.6 };
-    segments.push(s);
-    segments.sort((a, b) => a.start - b.start);
-    setTool('zoom');
-    updateTimeline();
-    selectItem('zoom', s.id);
-  });
-
-  function addHighlightAtPlayhead() {
-    const { start, end } = defaultSpan();
-    const h = { id: nextId++, start, end, x: 0.3, y: 0.3, w: 0.4, h: 0.4, opacity: 0.65 };
-    highlights.push(h);
-    highlights.sort((a, b) => a.start - b.start);
-    setTool('highlight');
-    updateTimeline();
-    selectItem('highlight', h.id);
-  }
-  addHighlightBtn.addEventListener('click', addHighlightAtPlayhead);
-  highlightBtn.addEventListener('click', () => setTool(tool === 'highlight' ? 'zoom' : 'highlight'));
+  addSegBtn.addEventListener('click', () => addAtPlayhead('zoom'));
+  addHighlightBtn.addEventListener('click', () => addAtPlayhead('highlight'));
   aimPreviewBtn.addEventListener('click', () => setAimPreview(!aimPreview));
 
-  delSegBtn.addEventListener('click', () => {
+  function deleteSelected() {
     const it = selectedItem();
     if (!it) return;
+    checkpoint();
     if (it.kind === 'zoom') segments = segments.filter(s => s.id !== selection.id);
     else highlights = highlights.filter(h => h.id !== selection.id);
     deselectItem();
+  }
+  delSegBtn.addEventListener('click', deleteSelected);
+
+  // ---- Undo / redo: snapshots of everything you edit ----
+  function snapshot() { return JSON.stringify({ segments, highlights, trim, trimEndTouched }); }
+  function checkpoint() {
+    undoStack.push(snapshot());
+    if (undoStack.length > 200) undoStack.shift();
+    redoStack = [];
+  }
+  // a drag that changed nothing should not leave an empty undo step
+  function dropIfUnchanged() {
+    if (undoStack.length && undoStack[undoStack.length - 1] === snapshot()) undoStack.pop();
+  }
+  function restore(str) {
+    const o = JSON.parse(str);
+    segments = o.segments; highlights = o.highlights; trim = o.trim; trimEndTouched = o.trimEndTouched;
+    if (selection && !findItem(selection.kind, selection.id)) selection = null;
+    const it = selectedItem();
+    if (it && it.kind === 'zoom') zoomRange.value = it.item.zoom;
+    updateContextualControls();
+    updateTimeline();
+    updateSelectionUI();
+    refreshCanvasChrome();
+    draw();
+  }
+  function undo() { if (!undoStack.length) return; redoStack.push(snapshot()); restore(undoStack.pop()); }
+  function redo() { if (!redoStack.length) return; undoStack.push(snapshot()); restore(redoStack.pop()); }
+
+  // ---- Split, copy, paste, duplicate ----
+  function splitAt(kind, item, tm) {
+    if (!item || tm <= item.start + 0.1 || tm >= item.end - 0.1) return false;
+    checkpoint();
+    const right = Object.assign({}, item, { id: nextId++, start: tm });
+    item.end = tm;
+    (kind === 'zoom' ? segments : highlights).push(right);
+    (kind === 'zoom' ? segments : highlights).sort((a, b) => a.start - b.start);
+    updateTimeline();
+    selectItem(kind, right.id);
+    return true;
+  }
+  function splitAtPlayhead() {
+    const tm = video.currentTime;
+    const it = selectedItem();
+    if (it && splitAt(it.kind, it.item, tm)) return;
+    const s = findActiveSegment(tm);
+    if (s) splitAt('zoom', s, tm);
+  }
+  function copySelected() {
+    const it = selectedItem();
+    if (it) clipboard = { kind: it.kind, data: JSON.parse(JSON.stringify(it.item)) };
+  }
+  // paste lands at tm, shortened if it would run into the next block
+  function pasteAt(tm) {
+    if (!clipboard) return;
+    const { kind, data } = clipboard;
+    const len = data.end - data.start;
+    const { lo, hi } = laneGap(kind, tm);
+    let start = clamp(tm, lo, hi), end = Math.min(hi, start + len);
+    if (end - start < 0.15) return;
+    checkpoint();
+    const item = Object.assign({}, data, { id: nextId++, start, end });
+    (kind === 'zoom' ? segments : highlights).push(item);
+    (kind === 'zoom' ? segments : highlights).sort((a, b) => a.start - b.start);
+    updateTimeline();
+    selectItem(kind, item.id);
+  }
+  function duplicateSelected() {
+    const it = selectedItem();
+    if (!it) return;
+    copySelected();
+    pasteAt(it.item.end);
+  }
+
+  // ---- Zoom ratio: slider, presets, use for all ----
+  function setZoomOf(s, z) {
+    s.zoom = clamp(z, parseFloat(zoomRange.min), parseFloat(zoomRange.max));
+    lastZoom = s.zoom;
+    zoomRange.value = s.zoom;
+    updateSelectionUI();
+    updateTimeline();
+    if (video.paused) draw();
+  }
+  zoomRange.addEventListener('pointerdown', checkpoint);
+  zoomRange.addEventListener('keydown', checkpoint);
+  zoomRange.addEventListener('input', () => {
+    const s = selectedZoom();
+    if (!s) return;
+    setZoomOf(s, parseFloat(zoomRange.value));
+    parkOnItem('zoom', s, false);
+  });
+  zoomPresets.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-z]');
+    const s = selectedZoom();
+    if (!b || !s) return;
+    checkpoint();
+    setZoomOf(s, parseFloat(b.dataset.z));
+    parkOnItem('zoom', s, false);
+  });
+  function applyZoomToAll(z) {
+    checkpoint();
+    segments.forEach(s => { s.zoom = z; });
+    updateTimeline();
+    updateSelectionUI();
+    if (video.paused) draw();
+  }
+  applyAllBtn.addEventListener('click', () => { const s = selectedZoom(); if (s) applyZoomToAll(s.zoom); });
+
+  opacityRange.addEventListener('pointerdown', checkpoint);
+  opacityRange.addEventListener('keydown', checkpoint);
+  opacityRange.addEventListener('input', () => {
+    const it = selectedItem();
+    if (!it || it.kind !== 'highlight') return;
+    it.item.opacity = lastOpacity = parseFloat(opacityRange.value);
+    updateSelectionUI();
+    parkOnItem('highlight', it.item, false);
   });
 
-  function bindSlider(el, prop, labelEl, fmt, kind) {
-    el.addEventListener('input', () => {
-      const it = selectedItem();
-      if (!it || it.kind !== kind) return;
-      it.item[prop] = parseFloat(el.value);
-      labelEl.textContent = fmt(it.item[prop]);
-      parkOnItem(it.kind, it.item, false);
-    });
+  // ---- Motion: one setting for every zoom ----
+  function saveMotion() { try { localStorage.setItem('ztl.motion', JSON.stringify(motion)); } catch (_) { /* private mode */ } }
+  function syncMotionUI() {
+    easeRadios.forEach(r => { r.checked = r.value === motion.ease; });
   }
-  bindSlider(zoomRange, 'zoom', zoomLabel2, v => v.toFixed(2) + '×', 'zoom');
-  bindSlider(zoomInRange, 'zoomInDur', zoomInLabel2, v => v.toFixed(1) + 's', 'zoom');
-  bindSlider(zoomOutRange, 'zoomOutDur', zoomOutLabel2, v => v.toFixed(1) + 's', 'zoom');
-  bindSlider(opacityRange, 'opacity', opacityLabel2, v => Math.round(v * 100) + '%', 'highlight');
+  easeRadios.forEach(r => r.addEventListener('change', () => {
+    if (!r.checked) return;
+    // switching to or from Cut changes the ramps, so keep each zoom's hold the same
+    const holds = new Map(segments.map(s => [s, holdOf(s)]));
+    motion.ease = r.value;
+    for (const [s, h] of holds) s.end = clamp(s.start + lenForHold(s, h), s.start + 0.1, video.duration || s.end);
+    updateSelectionUI();
+    saveMotion(); syncMotionUI();
+    updateTimeline();
+    previewMotion();
+  }));
+  // play the selected zoom (or the first one) in, hold briefly, then stop
+  function previewMotion() {
+    const s = selectedZoom() || segments[0];
+    if (!s || !video.duration) return;
+    if (aimPreview) setAimPreview(false);
+    const p = prevAdj(s);
+    const from = p ? Math.max(p.start, s.start - 0.4) : Math.max(0, s.start - 0.15);
+    const lead = p ? panDur(s) : zoomRamps(s).rampIn;
+    previewStopAt = Math.min(s.end, s.start + lead + 0.5);
+    const go = () => video.play();
+    if (Math.abs(video.currentTime - from) < 0.001) go();
+    else { video.addEventListener('seeked', go, { once: true }); video.currentTime = from; }
+  }
+  motionPreviewBtn.addEventListener('click', previewMotion);
+  // draw each option's curve from the same functions playback uses
+  document.querySelectorAll('svg.curve').forEach(svg => {
+    const ez = EASES[svg.dataset.ease];
+    let d = '';
+    if (svg.dataset.ease === 'cut') d = 'M4 20L20 20L20 5L36 5';
+    else for (let i = 0; i <= 24; i++) {
+      const p = i / 24;
+      d += (i ? 'L' : 'M') + (4 + p * 32).toFixed(1) + ' ' + (20 - ez(p) * 15).toFixed(1);
+    }
+    svg.innerHTML = '<path d="' + d + '"/>';
+  });
+  syncMotionUI();
+
+  // ---- Right-click menu ----
+  function hideCtxMenu() { ctxMenu.hidden = true; ctxMenu.textContent = ''; }
+  function showCtxMenu(x, y, entries) {
+    ctxMenu.textContent = '';
+    for (const en of entries) {
+      if (en === '-') { const d = document.createElement('div'); d.className = 'sep'; ctxMenu.appendChild(d); continue; }
+      if (en.label) { const d = document.createElement('div'); d.className = 'lbl'; d.textContent = en.label; ctxMenu.appendChild(d); }
+      if (en.row) {
+        const row = document.createElement('div'); row.className = 'row';
+        for (const r of en.row) {
+          const b = document.createElement('button'); b.textContent = r.text;
+          b.addEventListener('click', () => { hideCtxMenu(); r.run(); });
+          row.appendChild(b);
+        }
+        ctxMenu.appendChild(row);
+        continue;
+      }
+      if (!en.text) continue;
+      const b = document.createElement('button');
+      if (en.danger) b.className = 'danger';
+      b.disabled = !!en.disabled;
+      b.innerHTML = '<span></span>' + (en.key ? '<kbd>' + en.key + '</kbd>' : '');
+      b.firstChild.textContent = en.text;
+      b.addEventListener('click', () => { hideCtxMenu(); en.run(); });
+      ctxMenu.appendChild(b);
+    }
+    ctxMenu.hidden = false;
+    const w = ctxMenu.offsetWidth, h = ctxMenu.offsetHeight;
+    ctxMenu.style.left = Math.min(x, window.innerWidth - w - 8) + 'px';
+    ctxMenu.style.top = Math.min(y, window.innerHeight - h - 8) + 'px';
+  }
+  const MOD = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl+';
+  timeline.addEventListener('contextmenu', (e) => {
+    if (!video.duration) return;
+    e.preventDefault();
+    hideGhost();
+    const tm = timeAtClientX(e.clientX);
+    const segEl = e.target.closest('.segment');
+    if (segEl) {
+      const kind = segEl.dataset.kind, id = Number(segEl.dataset.id);
+      const item = findItem(kind, id);
+      if (!item) return;
+      if (!selection || selection.id !== id) selectItem(kind, id);
+      const ph = video.currentTime;
+      const entries = [
+        { text: t('ctxSplit'), key: 'X', disabled: !(ph > item.start + 0.1 && ph < item.end - 0.1), run: () => splitAt(kind, item, ph) },
+      ];
+      if (kind === 'zoom') {
+        entries.push('-', { label: t('ctxLevel'), row: [1.5, 2, 2.5, 3].map(z => ({ text: z + '×', run: () => { checkpoint(); setZoomOf(item, z); } })) });
+        entries.push({ text: t('applyAll_title'), run: () => applyZoomToAll(item.zoom) });
+      }
+      entries.push('-',
+        { text: t('ctxCopy'), key: MOD + 'C', run: copySelected },
+        { text: t('ctxDup'), key: MOD + 'D', run: duplicateSelected },
+        '-',
+        { text: t('ctxDelete'), key: 'Del', danger: true, run: deleteSelected });
+      showCtxMenu(e.clientX, e.clientY, entries);
+      return;
+    }
+    const lane = laneAt(e.clientY);
+    if (lane) {
+      const span = proposedSpan(lane, tm, e.altKey);
+      showCtxMenu(e.clientX, e.clientY, [
+        { text: t(lane === 'zoom' ? 'ctxAddZoom' : 'ctxAddHl'), disabled: !span, run: () => span && createItem(lane, span.start, span.end) },
+        { text: t('ctxPaste'), key: MOD + 'V', disabled: !clipboard || clipboard.kind !== lane, run: () => pasteAt(tm) },
+      ]);
+      return;
+    }
+    const trimmed = trim.start > 0.001 || trim.end < video.duration - 0.001;
+    showCtxMenu(e.clientX, e.clientY, [
+      { text: t('ctxTrimIn'), key: 'I', run: setTrimIn },
+      { text: t('ctxTrimOut'), key: 'O', run: setTrimOut },
+      { text: t('ctxResetTrim'), disabled: !trimmed, run: resetTrim },
+    ]);
+  });
+  window.addEventListener('pointerdown', (e) => { if (!ctxMenu.hidden && !ctxMenu.contains(e.target)) hideCtxMenu(); });
+  window.addEventListener('blur', hideCtxMenu);
+
+  // ---- Exact times typed into the inspector ----
+  function applyTimeField(which) {
+    const it = selectedItem();
+    if (!it) return;
+    const s = it.item, dur = video.duration || 0, MIN_LEN = 0.1;
+    const v = parseFloat((which === 'start' ? fStart : fLen).value);
+    if (isFinite(v)) {
+      checkpoint();
+      if (!video.paused) video.pause();
+      if (which === 'start') {
+        // a new start moves the whole block, so the hold stays what it was
+        const len = s.end - s.start;
+        s.start = clamp(v, 0, Math.max(0, dur - len));
+        s.end = s.start + len;
+        video.currentTime = s.start;
+      } else if (it.kind === 'zoom') {
+        const h = Math.max(0, v);
+        lastHold = h;
+        s.end = clamp(s.start + lenForHold(s, h), s.start + MIN_LEN, dur);
+        video.currentTime = itemPreviewTime('zoom', s);
+      } else {
+        s.end = clamp(s.start + Math.max(MIN_LEN, v), s.start + MIN_LEN, dur);
+        video.currentTime = s.end;
+      }
+    }
+    updateTimeline();
+    updateSelectionUI();
+  }
+  fStart.addEventListener('change', () => applyTimeField('start'));
+  fLen.addEventListener('change', () => applyTimeField('len'));
+  [fStart, fLen].forEach(el => el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') el.blur();
+  }));
+
+  prevFrameBtn.addEventListener('click', () => nudgePlayhead(-1 / 30));
+  nextFrameBtn.addEventListener('click', () => nudgePlayhead(1 / 30));
+
+  // pinch / ctrl + scroll on the frame changes the selected zoom's ratio;
+  // one undo step per burst of wheel events
+  let lastWheelAt = 0;
+  canvas.addEventListener('wheel', (e) => {
+    const s = selectedZoom();
+    if (!s || !(e.ctrlKey || e.metaKey)) return;
+    e.preventDefault();
+    if (performance.now() - lastWheelAt > 500) checkpoint();
+    lastWheelAt = performance.now();
+    setZoomOf(s, s.zoom * Math.exp(-e.deltaY * 0.01));
+  }, { passive: false });
+  let canvasGestureBase = 1;
+  canvas.addEventListener('gesturestart', (e) => { const s = selectedZoom(); if (s) { e.preventDefault(); checkpoint(); canvasGestureBase = s.zoom; } });
+  canvas.addEventListener('gesturechange', (e) => {
+    const s = selectedZoom();
+    if (!s) return;
+    e.preventDefault();
+    setZoomOf(s, canvasGestureBase * e.scale);
+  });
 
   // ---- Canvas pointer dispatch ----
   // click/drag on the frame sets the zoom point of the selected segment
@@ -1135,13 +2161,26 @@
     h.x = left; h.y = top; h.w = right - left; h.h = bottom - top;
   }
 
+  // what a click on the frame edits follows the selection. With nothing
+  // selected, it picks the highlight or zoom showing at the playhead.
   function onCanvasPointerDown(e) {
-    if (!video.videoWidth) return;
-    if (tool === 'highlight') {
+    if (!video.videoWidth || e.button !== 0) return;
+    hideCtxMenu();
+    let sel = selectedItem();
+    if (!sel) {
+      const tm = video.currentTime;
+      const visHl = highlights.filter(h => tm >= h.start && tm <= h.end);
+      const hit = visHl.length ? hitTestHighlight(e) : null;
+      if (hit && visHl.some(h => h.id === hit.id)) selectItem('highlight', hit.id);
+      else { const s = findActiveSegment(tm); if (s) selectItem('zoom', s.id); }
+      sel = selectedItem();
+      if (!sel) return;
+    }
+    checkpoint();
+    if (sel.kind === 'highlight') {
       const hit = hitTestHighlight(e);
-      if (hit) {
-        selectItem('highlight', hit.id);
-        const h = findItem('highlight', hit.id);
+      if (hit && hit.id === sel.item.id) {
+        const h = sel.item;
         canvasDrag = {
           type: hit.mode === 'move' ? 'hl-move' : 'hl-resize',
           handle: hit.handle,
@@ -1149,13 +2188,12 @@
           orig: { x: h.x, y: h.y, w: h.w, h: h.h },
         };
       } else {
+        // drag outside the box draws it again
         const o = canvasEventToOutputNorm(e);
         canvasDrag = { type: 'hl-create', origin: o, cur: o };
       }
       e.preventDefault();
     } else {
-      const s = selectedZoom();
-      if (!s) return;
       const aim = hitTestAimBox(e);
       if (aim === 'move') canvasDrag = { type: 'aim-move' };
       else if (aim) canvasDrag = { type: 'aim-resize', corner: aim };
@@ -1184,12 +2222,7 @@
       const p = canvasEventToSourcePx(e);
       const halfW = Math.max(4, Math.abs(p.x - s.focusX * vw));
       const halfH = Math.max(4, Math.abs(p.y - s.focusY * vh));
-      let z = Math.min(vw / (2 * halfW), vh / (2 * halfH));
-      z = clamp(z, parseFloat(zoomRange.min), parseFloat(zoomRange.max));
-      s.zoom = z;
-      zoomRange.value = z;
-      zoomLabel2.textContent = z.toFixed(2) + '×';
-      if (video.paused) draw();
+      setZoomOf(s, Math.min(vw / (2 * halfW), vh / (2 * halfH)));
       return;
     }
     if (d.type === 'hl-create') {
@@ -1223,20 +2256,14 @@
     if (d && d.type === 'hl-create') {
       const x = Math.min(d.origin.x, d.cur.x), y = Math.min(d.origin.y, d.cur.y);
       const w = Math.abs(d.cur.x - d.origin.x), h = Math.abs(d.cur.y - d.origin.y);
-      if (w * canvas.width >= 8 && h * canvas.height >= 8) {
-        const { start, end } = defaultSpan();
-        const item = { id: nextId++, start, end, x, y, w, h, opacity: parseFloat(opacityRange.value) || 0.65 };
-        highlights.push(item);
-        highlights.sort((a, b) => a.start - b.start);
-        updateTimeline();
-        selectItem('highlight', item.id);
-      } else {
-        updateTimeline();
-        updateSelectionUI();
+      const it = selectedItem();
+      if (it && it.kind === 'highlight' && w * canvas.width >= 8 && h * canvas.height >= 8) {
+        Object.assign(it.item, { x, y, w, h });
       }
-    } else if (d && d.type === 'aim-resize') {
-      updateSelectionUI();
     }
+    dropIfUnchanged();
+    updateSelectionUI();
+    updateTimeline();
     if (video.paused) draw();
   }
 
@@ -1249,15 +2276,13 @@
   function adjustSelectedZoom(delta) {
     const s = selectedZoom();
     if (!s) return;
-    s.zoom = clamp(s.zoom + delta, parseFloat(zoomRange.min), parseFloat(zoomRange.max));
-    zoomRange.value = s.zoom;
-    zoomLabel2.textContent = s.zoom.toFixed(2) + '×';
-    updateSelectionUI();
-    if (video.paused) draw();
+    checkpoint();
+    setZoomOf(s, s.zoom + delta);
   }
   function adjustSelectedOpacity(delta) {
     const it = selectedItem();
     if (!it || it.kind !== 'highlight') return;
+    checkpoint();
     it.item.opacity = clamp(it.item.opacity + delta, parseFloat(opacityRange.min), parseFloat(opacityRange.max));
     opacityRange.value = it.item.opacity;
     updateSelectionUI();
@@ -1283,27 +2308,42 @@
     const typing = el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName);
     if (typing && e.key !== 'Escape' && e.key !== '?') return;
     if (el && el.tagName === 'BUTTON' && (e.key === ' ' || e.key === 'Enter')) return;
+    if ((e.metaKey || e.ctrlKey) && !typing && video.videoWidth) {
+      const mk = e.key.toLowerCase();
+      if (mk === 'z') { e.preventDefault(); if (e.shiftKey) redo(); else undo(); }
+      else if (mk === 'y') { e.preventDefault(); redo(); }
+      else if (mk === 'c' && selection) { e.preventDefault(); copySelected(); }
+      else if (mk === 'v' && clipboard) { e.preventDefault(); pasteAt(video.currentTime); }
+      else if (mk === 'd' && selection) { e.preventDefault(); duplicateSelected(); }
+      return;
+    }
     if (e.metaKey || e.ctrlKey) return;
 
     const k = e.key;
     if (k === '?') { e.preventDefault(); toggleCheatSheet(); return; }
     if (k === 'Escape') {
+      if (!ctxMenu.hidden) { hideCtxMenu(); return; }
       if (canvasDrag && canvasDrag.type === 'hl-create') { cancelCanvasDrag(); return; }
       if (!cheatSheet.hidden) { toggleCheatSheet(false); return; }
-      if (tool === 'highlight') { setTool('zoom'); return; }
       if (selection) { deselectItem(); return; }
       return;
     }
     if (!video.videoWidth) return;
 
-    if (k === ' ') { e.preventDefault(); if (video.paused) video.play(); else video.pause(); return; }
-    if (k === 'a' || k === 'A') { if (!addSegBtn.disabled) addSegBtn.click(); return; }
-    if (k === 'h' || k === 'H') { setTool(tool === 'highlight' ? 'zoom' : 'highlight'); return; }
+    if (k === ' ') { e.preventDefault(); togglePlay(); return; }
+    if (k === 'x' || k === 'X') { splitAtPlayhead(); return; }
+    if (k === 'i' || k === 'I') { setTrimIn(); return; }
+    if (k === 'o' || k === 'O') { setTrimOut(); return; }
+    if (k === '=' || k === '+') { setTlZoom(tlZoom * 1.6); return; }
+    if (k === '-' || k === '_') { setTlZoom(tlZoom / 1.6); return; }
+    if (k === '0') { setTlZoom(1); return; }
+    if (k === 'a' || k === 'A') { addAtPlayhead('zoom'); return; }
+    if (k === 'h' || k === 'H') { addAtPlayhead('highlight'); return; }
     if (k === 'r' || k === 'R') { recordBtn.click(); return; }
     if (k === 'v' || k === 'V') { setAimPreview(!aimPreview); return; }
     if (k === 'Delete' || k === 'Backspace') {
       e.preventDefault();
-      if (!delSegBtn.disabled) delSegBtn.click();
+      deleteSelected();
       return;
     }
     if (k === '[' || k === ']') {
@@ -1406,8 +2446,8 @@
         video.requestVideoFrameCallback(onVideoFrame);
       }
     };
-    if (video.currentTime === 0) begin();
-    else { video.addEventListener('seeked', begin, { once: true }); video.currentTime = 0; }
+    if (Math.abs(video.currentTime - trim.start) < 0.001) begin();
+    else { video.addEventListener('seeked', begin, { once: true }); video.currentTime = trim.start; }
   }
 
   function stopRecording() {
@@ -1442,6 +2482,7 @@
     cheatBody.innerHTML = t('cheatHtml');
     updateRecordUI();
     updateSelectionUI();
+    updateTrimUI();
     refreshCanvasChrome();
     try { localStorage.setItem('ztl.lang', lang); } catch (_) { /* private mode */ }
   }
