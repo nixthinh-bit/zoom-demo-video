@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Zoom Timeline Editor</title>
+<title>Zoom Timeline Editor (by ThinhLe)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap">
 <style>
@@ -467,17 +467,31 @@
   /* empty stage: light card instead of a black letterbox, so Bao's outline reads */
   .stage:has(> #dropHint:not([style*="none"])) { background: var(--panel); }
   .stage:has(> #dropHint:not([style*="none"])) .dropHint { color: var(--muted); }
+  .langwrap { position: relative; }
+  button.lang { min-width: 0; }
+  .langmenu {
+    position: absolute; left: 0; top: calc(100% + 10px); z-index: 70; min-width: 170px; padding: 6px;
+    display: flex; flex-direction: column; gap: 2px;
+    background: var(--panel); border: 2.5px solid var(--border); border-radius: 16px; box-shadow: 4px 5px 0 var(--border);
+  }
+  .langmenu button { justify-content: flex-start; min-height: 0; padding: 8px 12px; border-radius: 10px; box-shadow: none; background: transparent; font-weight: 700; }
+  .langmenu button:hover:not(:disabled) { background: var(--panel-2); transform: none; }
+  .langmenu button[aria-selected="true"] { background: var(--accent); color: var(--on-color); }
+  /* lane-name column sizes to its labels (long translations such as ズーム / ハイライト no longer wrap) */
+  .tl-wrap { grid-template-columns: minmax(84px, max-content) minmax(0, 1fr); }
+  .ll, .ll-btn { white-space: nowrap; }
+  @media (max-width: 520px) { .tl-wrap { grid-template-columns: minmax(64px, max-content) minmax(0, 1fr); } }
   @media (prefers-reduced-motion: reduce) { button { transition: none; } }
 </style>
 </head>
 <body>
 
   <header class="topbar">
-    <div class="brand"><span class="logo">◎</span><h1 data-i18n="title">Zoom Timeline Editor</h1><span class="badge" id="resBadge"></span></div>
+    <div class="brand"><span class="logo">◎</span><h1 data-i18n="title">Zoom Timeline Editor (by ThinhLe)</h1><span class="badge" id="resBadge"></span></div>
     <div class="actions">
-      <a class="saveLink" id="saveLink" download data-i18n="save">⤓ Download again</a>
+      <div class="langwrap"><button class="lang" id="langBtn" aria-haspopup="listbox" aria-expanded="false">Language</button><div class="langmenu" id="langMenu" role="listbox" hidden></div></div>
       <button id="helpBtn" data-i18n="help" data-i18n-title="help_title">? Keys</button>
-      <button class="lang" id="langBtn">VI</button>
+      <a class="saveLink" id="saveLink" download data-i18n="save">⤓ Download again</a>
       <button class="rec" id="recordBtn" disabled data-i18n-title="rec_title">⤓ Save video</button>
     </div>
   </header>
@@ -611,7 +625,7 @@
 (() => {
   const STR = {
     en: {
-      title: 'Zoom Timeline Editor',
+      title: 'Zoom Timeline Editor (by ThinhLe)',
       dropHint1: 'Drag & drop a video here, or',
       pick: 'Choose video…',
       dropNote: 'The video is read directly from your device — nothing is uploaded.',
@@ -663,7 +677,7 @@
       delItem_title: 'Delete the selected segment or highlight (Delete)',
       aimView_title: 'Preview the settled zoom while editing (V)',
       help_title: 'Keyboard shortcuts (?)',
-      lang: 'VI',
+      lang: 'Language',
       canvasBadge: (vw, vh) => `Output: ${vw}×${vh} (source resolution)`,
       segBadge: (s) => `Zoom ${s.zoom.toFixed(2)}×`,
       hlBadge: () => 'Highlight',
@@ -702,7 +716,7 @@
       `,
     },
     vi: {
-      title: 'Zoom Timeline Editor',
+      title: 'Zoom Timeline Editor (by ThinhLe)',
       dropHint1: 'Kéo-thả video vào đây, hoặc',
       pick: 'Chọn video…',
       dropNote: 'Video được đọc trực tiếp từ máy, không upload lên đâu cả.',
@@ -754,7 +768,7 @@
       delItem_title: 'Xoá đoạn zoom hoặc vùng sáng đang chọn (Delete)',
       aimView_title: 'Xem trước mức zoom đã đặt trong lúc chỉnh (V)',
       help_title: 'Phím tắt (?)',
-      lang: 'EN',
+      lang: 'Ngôn ngữ',
       canvasBadge: (vw, vh) => `Đầu ra: ${vw}×${vh} (đúng độ phân giải gốc)`,
       segBadge: (s) => `Zoom ${s.zoom.toFixed(2)}×`,
       hlBadge: () => 'Vùng sáng',
@@ -792,7 +806,558 @@
         <p>Kéo một trong hai đầu màu xanh của dải Video, hoặc bấm <kbd>I</kbd> / <kbd>O</kbd> tại playhead. Nút Phát và Lưu video chỉ chạy phần còn lại. File gốc không bị đụng tới: nút ↺ cạnh tên dải trả lại toàn bộ.</p>
       `,
     },
+    zh: {
+      title: "Zoom Timeline Editor (by ThinhLe)",
+      dropHint1: "将视频拖放到这里，或",
+      pick: "选择视频…",
+      dropNote: "视频直接在你的设备上读取，不会上传任何内容。",
+      play: "▶ 播放",
+      pause: "⏸ 暂停",
+      startRec: "⤓ 保存视频",
+      stopRec: "■ 停止",
+      save: "⤓ 重新下载",
+      delItem: "删除",
+      laneVideo: "视频",
+      trimReset_title: "撤销裁剪，保留整个视频",
+      trimHandle_title: "拖动以裁掉视频开头或结尾（或在播放头处按 I / O）",
+      clip_title: "你的视频。拖动蓝色两端可裁掉开头或结尾",
+      clipLabel: (a, b, full) => full ? `视频 · ${(b - a).toFixed(1)}s` : `已裁剪：${a.toFixed(2)} → ${b.toFixed(2)}s · ${(b - a).toFixed(1)}s`,
+      motionTitle: "动效",
+      motionScope: "所有缩放",
+      aimHint: "拖动视频上的圆点来选择要看的位置。",
+      applyAll: "应用到全部",
+      applyAll_title: "让每个缩放都使用此倍率",
+      hintEditHl: "拖动方框可移动，拖动手柄可调整大小，在方框外拖动可重新绘制",
+      hintEmpty: "点击时间轴上的缩放轨道来添加缩放",
+      ctxSplit: "在播放头处分割",
+      ctxCopy: "复制",
+      ctxDup: "创建副本",
+      ctxDelete: "删除",
+      ctxPaste: "粘贴到此处",
+      ctxAddZoom: "在此添加缩放",
+      ctxAddHl: "在此添加高亮",
+      ctxLevel: "缩放级别",
+      ctxResetTrim: "撤销裁剪",
+      ctxTrimIn: "从播放头处开始视频",
+      ctxTrimOut: "在播放头处结束视频",
+      aimView: "瞄准视图",
+      help: "? 快捷键",
+      selectedLabel: "已选中",
+      emptySel: "点击时间轴上的方块进行编辑。要添加缩放，请点击缩放轨道或在其上拖动。",
+      fStart: "缩放开始于（秒）",
+      fHold: "保持时长（秒）",
+      fLen: "显示时长（秒）",
+      fStartHl: "开始（秒）",
+      holdHint: (a, b) => `在 ${a.toFixed(1)}s 开始缩放，在 ${b.toFixed(1)}s 恢复正常。`,
+      laneZoom: "缩放",
+      laneHl: "高亮",
+      tlFit: "适应",
+      tlFit_title: "显示整个视频 (0)",
+      tlIn_title: "放大时间轴 (=)",
+      tlOut_title: "缩小时间轴 (-)",
+      prevFrame_title: "上一帧 (←)",
+      nextFrame_title: "下一帧 (→)",
+      tlHint: "点击缩放轨道添加缩放，或在其上拖动 · 将两个缩放首尾相接可在两处之间平移 · 右键点击方块查看更多 · 双指捏合缩放时间轴",
+      zoomLabel: "缩放倍率",
+      ease_smooth: "平滑",
+      ease_snappy: "迅捷",
+      ease_spring: "弹簧",
+      ease_cut: "硬切",
+      ease_smooth_title: "起步平缓，加速，再平缓落定。稳妥的默认选项",
+      ease_snappy_title: "一开始就快速移动，然后轻柔地落到目标上",
+      ease_spring_title: "略微越过目标，再弹回来",
+      ease_cut_title: "无动画：直接切入，直接切出",
+      motionPreview: "▶ 试看动效",
+      motionPreview_title: "播放所选缩放（或第一个缩放）来查看动效",
+      opacityLabel: "压暗程度",
+      hintAimZoom: "拖动圆点选择要看的位置 · 捏合或拖动方框角来改变倍率",
+      play_title: "播放 / 暂停（空格）",
+      rec_title: "保存视频：回到开头，完整播放，保存文件 (R)",
+      addSeg_title: "在播放头处添加缩放 (A)",
+      addHighlight_title: "在播放头处添加高亮 (H)",
+      delItem_title: "删除所选的缩放或高亮 (Delete)",
+      aimView_title: "编辑时预览最终缩放效果 (V)",
+      help_title: "键盘快捷键 (?)",
+      lang: '语言',
+      canvasBadge: (vw, vh) => `输出：${vw}×${vh}（源分辨率）`,
+      segBadge: (s) => `缩放 ${s.zoom.toFixed(2)}×`,
+      hlBadge: () => "高亮",
+      recFail: "此浏览器不支持录制。",
+      lowFpsWarn: (fps) => `仅捕获到约 ${fps} 帧/秒，这次录制会卡顿。录制时请让此标签页保持可见并位于前台——浏览器会暂停后台标签页的绘制。`,
+      cheatHtml: `
+        <h3>键盘快捷键</h3>
+        <table>
+          <tr><td>点击缩放轨道</td><td>在该处添加缩放。在轨道上拖动，可使其长度等于你拖动的距离</td></tr>
+          <tr><td>右键点击方块</td><td>分割、缩放级别、复制、创建副本、删除</td></tr>
+          <tr><td><kbd>Space</kbd></td><td>播放 / 暂停</td></tr>
+          <tr><td><kbd>A</kbd> / <kbd>H</kbd></td><td>在播放头处添加缩放 / 高亮</td></tr>
+          <tr><td><kbd>X</kbd></td><td>在播放头处分割所选方块（或播放头下的缩放）</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>Z</kbd> / <kbd>Shift</kbd> + <kbd>Cmd</kbd> + <kbd>Z</kbd></td><td>撤销 / 重做</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>C</kbd> <kbd>V</kbd> <kbd>D</kbd></td><td>复制 / 在播放头处粘贴 / 创建副本</td></tr>
+          <tr><td><kbd>R</kbd></td><td>保存视频（回到开头，完整播放，保存），或提前停止</td></tr>
+          <tr><td><kbd>I</kbd> <kbd>O</kbd></td><td>裁剪：在播放头处开始 / 结束视频</td></tr>
+          <tr><td><kbd>V</kbd></td><td>切换瞄准视图（编辑时预览最终缩放效果）</td></tr>
+          <tr><td><kbd>[</kbd> <kbd>]</kbd></td><td>所选缩放倍率 ±0.1，或高亮压暗程度 ±5%</td></tr>
+          <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>将播放头移动一帧（<kbd>Shift</kbd>：一秒）</td></tr>
+          <tr><td><kbd>Delete</kbd></td><td>删除所选方块</td></tr>
+          <tr><td><kbd>=</kbd> <kbd>-</kbd> <kbd>0</kbd></td><td>放大 / 缩小时间轴 / 显示整个视频</td></tr>
+          <tr><td>双指捏合，<kbd>Ctrl</kbd> + 滚动</td><td>在时间轴上：缩放时间轴。在视频上：改变所选缩放的倍率</td></tr>
+          <tr><td>拖动时按住 <kbd>Alt</kbd></td><td>关闭对其他边缘的吸附</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>关闭菜单、取消选择或关闭此面板</td></tr>
+          <tr><td><kbd>?</kbd></td><td>显示或隐藏此面板</td></tr>
+        </table>
+        <h3>每个缩放只有两项设置</h3>
+        <p>缩放多大（倍率，1.5× 到 3× 一键即可）以及看向哪里（拖动视频上的圆点）。每个缩放在开始处放大，保持你设定的时长，然后自动恢复正常。进出的动效在“动效”卡片中为整个视频统一设置：平滑、迅捷、弹簧或硬切。</p>
+        <h3>从一处平移到另一处</h3>
+        <p>将两个缩放首尾相接（边缘会自动吸附，或用 <kbd>X</kbd> 分割一个缩放）。画面会从第一处滑向第二处，中间不会缩小。小小的 ⇄ 标记显示平移发生的位置。</p>
+        <h3>高亮</h3>
+        <p>点击高亮轨道或按 <kbd>H</kbd>。方框保持明亮，画面其余部分变暗。选中高亮后，可在视频上拖动其方框或手柄，或在方框外拖动重新绘制。</p>
+        <h3>裁剪视频</h3>
+        <p>拖动视频轨道任一蓝色端，或在播放头处按 <kbd>I</kbd> / <kbd>O</kbd>。播放和保存视频只会处理保留的部分。你的文件不会被删除：轨道名称旁的 ↺ 可恢复全部。</p>
+      `,
+    },
+    th: {
+      title: "Zoom Timeline Editor (by ThinhLe)",
+      dropHint1: "ลากและวางวิดีโอที่นี่ หรือ",
+      pick: "เลือกวิดีโอ…",
+      dropNote: "วิดีโออ่านจากอุปกรณ์ของคุณโดยตรง ไม่มีการอัปโหลดใดๆ",
+      play: "▶ เล่น",
+      pause: "⏸ หยุดชั่วคราว",
+      startRec: "⤓ บันทึกวิดีโอ",
+      stopRec: "■ หยุด",
+      save: "⤓ ดาวน์โหลดอีกครั้ง",
+      delItem: "ลบ",
+      laneVideo: "วิดีโอ",
+      trimReset_title: "ยกเลิกการตัดและเก็บวิดีโอทั้งหมดไว้",
+      trimHandle_title: "ลากเพื่อตัดช่วงต้นหรือท้ายของวิดีโอ (หรือกด I / O ที่หัวเล่น)",
+      clip_title: "วิดีโอของคุณ ลากปลายสีน้ำเงินเพื่อตัดช่วงต้นหรือท้าย",
+      clipLabel: (a, b, full) => full ? `วิดีโอ · ${(b - a).toFixed(1)}s` : `ตัดแล้ว: ${a.toFixed(2)} → ${b.toFixed(2)}s · ${(b - a).toFixed(1)}s`,
+      motionTitle: "การเคลื่อนไหว",
+      motionScope: "ทุกการซูม",
+      aimHint: "ลากจุดบนวิดีโอเพื่อเลือกตำแหน่งที่จะมอง",
+      applyAll: "ใช้กับทั้งหมด",
+      applyAll_title: "ตั้งอัตราซูมนี้ให้ทุกการซูม",
+      hintEditHl: "ลากกรอบเพื่อย้าย ลากที่จับเพื่อปรับขนาด หรือลากนอกกรอบเพื่อวาดใหม่",
+      hintEmpty: "คลิกแถบซูมบนไทม์ไลน์เพื่อเพิ่มการซูม",
+      ctxSplit: "แบ่งที่หัวเล่น",
+      ctxCopy: "คัดลอก",
+      ctxDup: "ทำซ้ำ",
+      ctxDelete: "ลบ",
+      ctxPaste: "วางที่นี่",
+      ctxAddZoom: "เพิ่มการซูมที่นี่",
+      ctxAddHl: "เพิ่มไฮไลต์ที่นี่",
+      ctxLevel: "ระดับการซูม",
+      ctxResetTrim: "ยกเลิกการตัด",
+      ctxTrimIn: "เริ่มวิดีโอที่หัวเล่น",
+      ctxTrimOut: "จบวิดีโอที่หัวเล่น",
+      aimView: "มุมมองเล็ง",
+      help: "? ปุ่มลัด",
+      selectedLabel: "ที่เลือก",
+      emptySel: "คลิกบล็อกบนไทม์ไลน์เพื่อแก้ไข หากต้องการเพิ่มการซูม ให้คลิกแถบซูมหรือลากข้ามแถบนั้น",
+      fStart: "เริ่มซูมที่ (วิ)",
+      fHold: "ค้างไว้ (วิ)",
+      fLen: "แสดงนาน (วิ)",
+      fStartHl: "เริ่ม (วิ)",
+      holdHint: (a, b) => `ซูมเข้าที่ ${a.toFixed(1)}s และกลับเป็นปกติที่ ${b.toFixed(1)}s`,
+      laneZoom: "ซูม",
+      laneHl: "ไฮไลต์",
+      tlFit: "พอดี",
+      tlFit_title: "แสดงวิดีโอทั้งหมด (0)",
+      tlIn_title: "ขยายไทม์ไลน์ (=)",
+      tlOut_title: "ย่อไทม์ไลน์ (-)",
+      prevFrame_title: "เฟรมก่อนหน้า (←)",
+      nextFrame_title: "เฟรมถัดไป (→)",
+      tlHint: "คลิกแถบซูมเพื่อเพิ่มการซูม หรือลากข้ามแถบ · วางสองการซูมติดกันเพื่อเลื่อนภาพจากจุดหนึ่งไปอีกจุด · คลิกขวาที่บล็อกเพื่อดูตัวเลือกเพิ่มเติม · ถ่างสองนิ้วเพื่อซูมไทม์ไลน์",
+      zoomLabel: "อัตราซูม",
+      ease_smooth: "นุ่มนวล",
+      ease_snappy: "ฉับไว",
+      ease_spring: "เด้ง",
+      ease_cut: "ตัดฉับ",
+      ease_smooth_title: "เริ่มช้าๆ เร่งขึ้น แล้วลงจอดอย่างนุ่มนวล ตัวเลือกเริ่มต้นที่ปลอดภัย",
+      ease_snappy_title: "พุ่งเร็วทันที แล้วค่อยๆ ลงที่เป้าหมายอย่างนุ่มนวล",
+      ease_spring_title: "เลยเป้าหมายไปเล็กน้อยแล้วเด้งกลับ",
+      ease_cut_title: "ไม่มีแอนิเมชัน: กระโดดเข้าและกระโดดออกทันที",
+      motionPreview: "▶ ลองดูการเคลื่อนไหว",
+      motionPreview_title: "เล่นการซูมที่เลือก (หรืออันแรก) เพื่อดูการเคลื่อนไหว",
+      opacityLabel: "ความมืดของพื้นหลัง",
+      hintAimZoom: "ลากจุดเพื่อเลือกตำแหน่งที่จะมอง · ถ่างนิ้วหรือลากมุมกรอบเพื่อเปลี่ยนอัตราซูม",
+      play_title: "เล่น / หยุดชั่วคราว (Space)",
+      rec_title: "บันทึกวิดีโอ: กรอกลับ เล่นจนจบ แล้วบันทึกไฟล์ (R)",
+      addSeg_title: "เพิ่มการซูมที่หัวเล่น (A)",
+      addHighlight_title: "เพิ่มไฮไลต์ที่หัวเล่น (H)",
+      delItem_title: "ลบการซูมหรือไฮไลต์ที่เลือก (Delete)",
+      aimView_title: "ดูตัวอย่างการซูมที่ตั้งไว้ระหว่างแก้ไข (V)",
+      help_title: "ปุ่มลัดแป้นพิมพ์ (?)",
+      lang: 'ภาษา',
+      canvasBadge: (vw, vh) => `เอาต์พุต: ${vw}×${vh} (ความละเอียดต้นฉบับ)`,
+      segBadge: (s) => `ซูม ${s.zoom.toFixed(2)}×`,
+      hlBadge: () => "ไฮไลต์",
+      recFail: "เบราว์เซอร์นี้ไม่รองรับการบันทึก",
+      lowFpsWarn: (fps) => `บันทึกได้เพียงประมาณ ${fps} เฟรมต่อวินาที ภาพจึงจะกระตุก โปรดให้แท็บนี้แสดงอยู่ด้านหน้าระหว่างบันทึก เพราะเบราว์เซอร์จะหยุดวาดภาพในแท็บที่อยู่เบื้องหลัง`,
+      cheatHtml: `
+        <h3>ปุ่มลัดแป้นพิมพ์</h3>
+        <table>
+          <tr><td>คลิกแถบซูม</td><td>เพิ่มการซูมตรงนั้น ลากข้ามแถบเพื่อให้ยาวเท่าที่ลาก</td></tr>
+          <tr><td>คลิกขวาที่บล็อก</td><td>แบ่ง ระดับการซูม คัดลอก ทำซ้ำ ลบ</td></tr>
+          <tr><td><kbd>Space</kbd></td><td>เล่น / หยุดชั่วคราว</td></tr>
+          <tr><td><kbd>A</kbd> / <kbd>H</kbd></td><td>เพิ่มการซูม / ไฮไลต์ที่หัวเล่น</td></tr>
+          <tr><td><kbd>X</kbd></td><td>แบ่งบล็อกที่เลือก (หรือการซูมใต้หัวเล่น) ที่หัวเล่น</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>Z</kbd> / <kbd>Shift</kbd> + <kbd>Cmd</kbd> + <kbd>Z</kbd></td><td>เลิกทำ / ทำซ้ำ</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>C</kbd> <kbd>V</kbd> <kbd>D</kbd></td><td>คัดลอก / วางที่หัวเล่น / ทำซ้ำ</td></tr>
+          <tr><td><kbd>R</kbd></td><td>บันทึกวิดีโอ (กรอกลับ เล่นจนจบ บันทึก) หรือหยุดก่อน</td></tr>
+          <tr><td><kbd>I</kbd> <kbd>O</kbd></td><td>ตัด: เริ่ม / จบวิดีโอที่หัวเล่น</td></tr>
+          <tr><td><kbd>V</kbd></td><td>สลับมุมมองเล็ง (ดูตัวอย่างการซูมที่ตั้งไว้ระหว่างแก้ไข)</td></tr>
+          <tr><td><kbd>[</kbd> <kbd>]</kbd></td><td>อัตราซูมที่เลือก ±0.1 หรือความมืดของไฮไลต์ ±5%</td></tr>
+          <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>ขยับหัวเล่นทีละเฟรม (<kbd>Shift</kbd>: ทีละวินาที)</td></tr>
+          <tr><td><kbd>Delete</kbd></td><td>ลบบล็อกที่เลือก</td></tr>
+          <tr><td><kbd>=</kbd> <kbd>-</kbd> <kbd>0</kbd></td><td>ขยาย / ย่อไทม์ไลน์ / แสดงวิดีโอทั้งหมด</td></tr>
+          <tr><td>ถ่างนิ้ว, <kbd>Ctrl</kbd> + เลื่อน</td><td>บนไทม์ไลน์: ซูมไทม์ไลน์ บนวิดีโอ: เปลี่ยนอัตราซูมที่เลือก</td></tr>
+          <tr><td>กด <kbd>Alt</kbd> ค้างขณะลาก</td><td>ปิดการดูดติดขอบของรายการอื่น</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>ปิดเมนู ยกเลิกการเลือก หรือปิดแผงนี้</td></tr>
+          <tr><td><kbd>?</kbd></td><td>แสดงหรือซ่อนแผงนี้</td></tr>
+        </table>
+        <h3>การซูมมีสองการตั้งค่า</h3>
+        <p>ซูมลึกแค่ไหน (อัตราซูม มี 1.5× ถึง 3× ให้คลิกเดียว) และมองที่ไหน (ลากจุดบนวิดีโอ) แต่ละการซูมจะซูมเข้าตอนเริ่ม ค้างตามเวลาที่ตั้ง แล้วกลับเป็นปกติเอง ส่วนลักษณะการเข้าและออกตั้งครั้งเดียวทั้งวิดีโอในการ์ดการเคลื่อนไหว: นุ่มนวล ฉับไว เด้ง หรือตัดฉับ</p>
+        <h3>เลื่อนจากจุดหนึ่งไปอีกจุด</h3>
+        <p>วางสองการซูมติดกัน (ขอบจะดูดติดกันเอง หรือแบ่งการซูมด้วย <kbd>X</kbd>) ภาพจะไหลจากจุดแรกไปจุดที่สองโดยไม่ซูมออกกลางทาง เครื่องหมาย ⇄ เล็กๆ แสดงจุดที่เลื่อน</p>
+        <h3>ไฮไลต์</h3>
+        <p>คลิกแถบไฮไลต์หรือกด <kbd>H</kbd> ส่วนที่เหลือของภาพจะมืดลงขณะที่กรอบยังสว่าง เมื่อเลือกไฮไลต์ ลากกรอบหรือที่จับบนวิดีโอ หรือลากนอกกรอบเพื่อวาดใหม่</p>
+        <h3>ตัดวิดีโอ</h3>
+        <p>ลากปลายสีน้ำเงินด้านใดด้านหนึ่งของแถบวิดีโอ หรือกด <kbd>I</kbd> / <kbd>O</kbd> ที่หัวเล่น การเล่นและบันทึกวิดีโอจะใช้เฉพาะส่วนที่เหลือ ไม่มีอะไรถูกลบออกจากไฟล์ของคุณ: ปุ่ม ↺ ข้างชื่อแถบจะนำทุกอย่างกลับมา</p>
+      `,
+    },
+    ja: {
+      title: "Zoom Timeline Editor (by ThinhLe)",
+      dropHint1: "ここに動画をドラッグ＆ドロップ、または",
+      pick: "動画を選択…",
+      dropNote: "動画はお使いのデバイスから直接読み込まれ、アップロードはされません。",
+      play: "▶ 再生",
+      pause: "⏸ 一時停止",
+      startRec: "⤓ 動画を保存",
+      stopRec: "■ 停止",
+      save: "⤓ もう一度ダウンロード",
+      delItem: "削除",
+      laneVideo: "ビデオ",
+      trimReset_title: "トリミングを取り消して動画全体を残す",
+      trimHandle_title: "ドラッグして動画の先頭または末尾をカット（再生ヘッド位置で I / O でも可）",
+      clip_title: "あなたの動画です。青い端をドラッグして先頭または末尾をカットします",
+      clipLabel: (a, b, full) => full ? `ビデオ · ${(b - a).toFixed(1)}s` : `カット: ${a.toFixed(2)} → ${b.toFixed(2)}s · ${(b - a).toFixed(1)}s`,
+      motionTitle: "モーション",
+      motionScope: "すべてのズーム",
+      aimHint: "動画上の点をドラッグして、見たい位置を選びます。",
+      applyAll: "すべてに適用",
+      applyAll_title: "すべてのズームにこの倍率を設定する",
+      hintEditHl: "枠をドラッグで移動、ハンドルをドラッグでサイズ変更、枠の外をドラッグで描き直し",
+      hintEmpty: "タイムラインのズームレーンをクリックしてズームを追加",
+      ctxSplit: "再生ヘッドで分割",
+      ctxCopy: "コピー",
+      ctxDup: "複製",
+      ctxDelete: "削除",
+      ctxPaste: "ここに貼り付け",
+      ctxAddZoom: "ここにズームを追加",
+      ctxAddHl: "ここにハイライトを追加",
+      ctxLevel: "ズームレベル",
+      ctxResetTrim: "トリミングを取り消す",
+      ctxTrimIn: "再生ヘッドから動画を開始",
+      ctxTrimOut: "再生ヘッドで動画を終了",
+      aimView: "狙いビュー",
+      help: "? ショートカット",
+      selectedLabel: "選択中",
+      emptySel: "タイムライン上のブロックをクリックして編集します。ズームを追加するには、ズームレーンをクリックするか、その上をドラッグします。",
+      fStart: "ズーム開始（秒）",
+      fHold: "保持時間（秒）",
+      fLen: "表示時間（秒）",
+      fStartHl: "開始（秒）",
+      holdHint: (a, b) => `${a.toFixed(1)}s にズームインし、${b.toFixed(1)}s に通常表示へ戻ります。`,
+      laneZoom: "ズーム",
+      laneHl: "ハイライト",
+      tlFit: "全体表示",
+      tlFit_title: "動画全体を表示 (0)",
+      tlIn_title: "タイムラインを拡大 (=)",
+      tlOut_title: "タイムラインを縮小 (-)",
+      prevFrame_title: "前のフレーム (←)",
+      nextFrame_title: "次のフレーム (→)",
+      tlHint: "ズームレーンをクリックして追加、またはドラッグで範囲指定 · 2つのズームを隣り合わせにすると、ズームアウトせずに視点が移動 · ブロックを右クリックでその他の操作 · ピンチでタイムラインを拡大",
+      zoomLabel: "ズーム倍率",
+      ease_smooth: "なめらか",
+      ease_snappy: "キビキビ",
+      ease_spring: "バネ",
+      ease_cut: "カット",
+      ease_smooth_title: "ゆっくり始まり、加速し、ゆっくり着地します。安全な標準設定",
+      ease_snappy_title: "最初から素早く動き、目標へやさしく収まります",
+      ease_spring_title: "目標を少し行き過ぎてから、バネのように戻ります",
+      ease_cut_title: "アニメーションなし: そのまま切り替わります",
+      motionPreview: "▶ モーションを試す",
+      motionPreview_title: "選択中のズーム（なければ最初のズーム）を再生してモーションを確認",
+      opacityLabel: "暗さ",
+      hintAimZoom: "点をドラッグして見たい位置を選択 · ピンチまたは枠の角をドラッグして倍率を変更",
+      play_title: "再生 / 一時停止 (Space)",
+      rec_title: "動画を保存: 先頭に戻って最後まで再生し、ファイルを保存 (R)",
+      addSeg_title: "再生ヘッド位置にズームを追加 (A)",
+      addHighlight_title: "再生ヘッド位置にハイライトを追加 (H)",
+      delItem_title: "選択中のズームまたはハイライトを削除 (Delete)",
+      aimView_title: "編集中に確定後のズームをプレビュー (V)",
+      help_title: "キーボードショートカット (?)",
+      lang: '言語',
+      canvasBadge: (vw, vh) => `出力: ${vw}×${vh}（元の解像度）`,
+      segBadge: (s) => `ズーム ${s.zoom.toFixed(2)}×`,
+      hlBadge: () => "ハイライト",
+      recFail: "このブラウザは録画に対応していません。",
+      lowFpsWarn: (fps) => `キャプチャできたのは毎秒約 ${fps} フレームのみで、この録画はカクつきます。録画中はこのタブを前面に表示したままにしてください。ブラウザはバックグラウンドのタブでは描画を停止します。`,
+      cheatHtml: `
+        <h3>キーボードショートカット</h3>
+        <table>
+          <tr><td>ズームレーンをクリック</td><td>その位置にズームを追加。レーン上をドラッグすると、ドラッグした長さになります</td></tr>
+          <tr><td>ブロックを右クリック</td><td>分割、ズームレベル、コピー、複製、削除</td></tr>
+          <tr><td><kbd>Space</kbd></td><td>再生 / 一時停止</td></tr>
+          <tr><td><kbd>A</kbd> / <kbd>H</kbd></td><td>再生ヘッド位置にズーム / ハイライトを追加</td></tr>
+          <tr><td><kbd>X</kbd></td><td>選択中のブロック（または再生ヘッド下のズーム）を再生ヘッドで分割</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>Z</kbd> / <kbd>Shift</kbd> + <kbd>Cmd</kbd> + <kbd>Z</kbd></td><td>元に戻す / やり直し</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>C</kbd> <kbd>V</kbd> <kbd>D</kbd></td><td>コピー / 再生ヘッドに貼り付け / 複製</td></tr>
+          <tr><td><kbd>R</kbd></td><td>動画を保存（先頭に戻り、最後まで再生して保存）、または途中で停止</td></tr>
+          <tr><td><kbd>I</kbd> <kbd>O</kbd></td><td>カット: 再生ヘッドで動画を開始 / 終了</td></tr>
+          <tr><td><kbd>V</kbd></td><td>狙いビューの切り替え（編集中に確定後のズームをプレビュー）</td></tr>
+          <tr><td><kbd>[</kbd> <kbd>]</kbd></td><td>選択中のズーム倍率 ±0.1、またはハイライトの暗さ ±5%</td></tr>
+          <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>再生ヘッドを1フレーム移動（<kbd>Shift</kbd>: 1秒）</td></tr>
+          <tr><td><kbd>Delete</kbd></td><td>選択中のブロックを削除</td></tr>
+          <tr><td><kbd>=</kbd> <kbd>-</kbd> <kbd>0</kbd></td><td>タイムラインを拡大 / 縮小 / 動画全体を表示</td></tr>
+          <tr><td>ピンチ、<kbd>Ctrl</kbd> + スクロール</td><td>タイムライン上: タイムラインを拡大縮小。動画上: 選択中のズーム倍率を変更</td></tr>
+          <tr><td>ドラッグ中に <kbd>Alt</kbd></td><td>他の端へのスナップをオフ</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>メニューを閉じる、選択解除、またはこのパネルを閉じる</td></tr>
+          <tr><td><kbd>?</kbd></td><td>このパネルを表示 / 非表示</td></tr>
+        </table>
+        <h3>ズームの設定は2つだけ</h3>
+        <p>どれだけ寄るか（倍率。1.5×〜3× はワンクリック）と、どこを見るか（動画上の点をドラッグ）。各ズームは開始位置でズームインし、設定した時間だけ保持し、自動で通常表示に戻ります。出入りの動きは、モーションカードで動画全体に一度だけ設定します: なめらか、キビキビ、バネ、カット。</p>
+        <h3>ある場所から別の場所へ移動</h3>
+        <p>2つのズームを隣り合わせに置きます（端は自動で吸着します。<kbd>X</kbd> で1つのズームを分割することもできます）。視点は途中でズームアウトせず、1つ目の位置から2つ目の位置へ滑らかに移ります。小さな ⇄ マークが移動する場所を示します。</p>
+        <h3>ハイライト</h3>
+        <p>ハイライトレーンをクリックするか <kbd>H</kbd> を押します。枠は明るいまま、フレームの残りが暗くなります。ハイライトを選択中は、動画上で枠やハンドルをドラッグするか、枠の外をドラッグして描き直せます。</p>
+        <h3>動画をカット</h3>
+        <p>ビデオレーンの青い端をドラッグするか、再生ヘッド位置で <kbd>I</kbd> / <kbd>O</kbd> を押します。再生と動画の保存は残った部分だけが対象です。元のファイルは何も削除されません: レーン名の横の ↺ で全部元に戻せます。</p>
+      `,
+    },
+    es: {
+      title: "Zoom Timeline Editor (by ThinhLe)",
+      dropHint1: "Arrastra y suelta un vídeo aquí, o",
+      pick: "Elegir vídeo…",
+      dropNote: "El vídeo se lee directamente desde tu dispositivo: no se sube nada.",
+      play: "▶ Reproducir",
+      pause: "⏸ Pausa",
+      startRec: "⤓ Guardar vídeo",
+      stopRec: "■ Detener",
+      save: "⤓ Descargar de nuevo",
+      delItem: "Eliminar",
+      laneVideo: "Vídeo",
+      trimReset_title: "Deshacer el recorte y conservar todo el vídeo",
+      trimHandle_title: "Arrastra para recortar el inicio o el final del vídeo (o I / O en el cabezal)",
+      clip_title: "Tu vídeo. Arrastra sus extremos azules para recortar el inicio o el final",
+      clipLabel: (a, b, full) => full ? `Vídeo · ${(b - a).toFixed(1)}s` : `Recorte: ${a.toFixed(2)} → ${b.toFixed(2)}s · ${(b - a).toFixed(1)}s`,
+      motionTitle: "Movimiento",
+      motionScope: "todos los zooms",
+      aimHint: "Arrastra el punto sobre el vídeo para elegir dónde mirar.",
+      applyAll: "Aplicar a todos",
+      applyAll_title: "Dar esta proporción a todos los zooms",
+      hintEditHl: "Arrastra el recuadro para moverlo, un tirador para cambiar su tamaño, o fuera de él para dibujarlo de nuevo",
+      hintEmpty: "Haz clic en la pista Zoom de la línea de tiempo para añadir un zoom",
+      ctxSplit: "Dividir en el cabezal",
+      ctxCopy: "Copiar",
+      ctxDup: "Duplicar",
+      ctxDelete: "Eliminar",
+      ctxPaste: "Pegar aquí",
+      ctxAddZoom: "Añadir zoom aquí",
+      ctxAddHl: "Añadir resaltado aquí",
+      ctxLevel: "Nivel de zoom",
+      ctxResetTrim: "Deshacer recorte",
+      ctxTrimIn: "Empezar el vídeo en el cabezal",
+      ctxTrimOut: "Terminar el vídeo en el cabezal",
+      aimView: "Vista de encuadre",
+      help: "? Atajos",
+      selectedLabel: "Seleccionado",
+      emptySel: "Haz clic en un bloque de la línea de tiempo para editarlo. Para añadir un zoom, haz clic en la pista Zoom o arrastra sobre ella.",
+      fStart: "Zoom desde (s)",
+      fHold: "Mantener (s)",
+      fLen: "Mostrar durante (s)",
+      fStartHl: "Inicio (s)",
+      holdHint: (a, b) => `Hace zoom a los ${a.toFixed(1)}s y vuelve a la normalidad a los ${b.toFixed(1)}s.`,
+      laneZoom: "Zoom",
+      laneHl: "Resaltado",
+      tlFit: "Ajustar",
+      tlFit_title: "Mostrar todo el vídeo (0)",
+      tlIn_title: "Acercar la línea de tiempo (=)",
+      tlOut_title: "Alejar la línea de tiempo (-)",
+      prevFrame_title: "Fotograma anterior (←)",
+      nextFrame_title: "Fotograma siguiente (→)",
+      tlHint: "Haz clic en la pista Zoom para añadir un zoom, o arrastra sobre ella · junta dos zooms para desplazarte de uno a otro · clic derecho en un bloque para más opciones · pellizca para hacer zoom en la línea de tiempo",
+      zoomLabel: "Proporción de zoom",
+      ease_smooth: "Suave",
+      ease_snappy: "Ágil",
+      ease_spring: "Elástico",
+      ease_cut: "Corte",
+      ease_smooth_title: "Empieza despacio, acelera y aterriza con suavidad. La opción segura",
+      ease_snappy_title: "Se mueve rápido desde el principio y se asienta con suavidad en el objetivo",
+      ease_spring_title: "Se pasa un poco del objetivo y rebota de vuelta",
+      ease_cut_title: "Sin animación: entra y sale de golpe",
+      motionPreview: "▶ Probar movimiento",
+      motionPreview_title: "Reproduce el zoom seleccionado (o el primero) para ver el movimiento",
+      opacityLabel: "Opacidad del oscurecido",
+      hintAimZoom: "Arrastra el punto para elegir dónde mirar · pellizca o arrastra una esquina del recuadro para cambiar la proporción",
+      play_title: "Reproducir / pausa (Espacio)",
+      rec_title: "Guardar vídeo: rebobina, reproduce completo y guarda el archivo (R)",
+      addSeg_title: "Añadir un zoom en el cabezal (A)",
+      addHighlight_title: "Añadir un resaltado en el cabezal (H)",
+      delItem_title: "Eliminar el zoom o resaltado seleccionado (Supr)",
+      aimView_title: "Previsualizar el zoom final mientras editas (V)",
+      help_title: "Atajos de teclado (?)",
+      lang: 'Idioma',
+      canvasBadge: (vw, vh) => `Salida: ${vw}×${vh} (resolución original)`,
+      segBadge: (s) => `Zoom ${s.zoom.toFixed(2)}×`,
+      hlBadge: () => "Resaltado",
+      recFail: "Este navegador no admite la grabación.",
+      lowFpsWarn: (fps) => `Solo se capturaron ~${fps} fotogramas por segundo, así que esta toma irá a tirones. Mantén esta pestaña visible y en primer plano mientras grabas: los navegadores dejan de dibujar en las pestañas en segundo plano.`,
+      cheatHtml: `
+        <h3>Atajos de teclado</h3>
+        <table>
+          <tr><td>Clic en la pista Zoom</td><td>Añade un zoom ahí. Arrastra sobre la pista para que dure lo que arrastres</td></tr>
+          <tr><td>Clic derecho en un bloque</td><td>Dividir, nivel de zoom, copiar, duplicar, eliminar</td></tr>
+          <tr><td><kbd>Space</kbd></td><td>Reproducir / pausa</td></tr>
+          <tr><td><kbd>A</kbd> / <kbd>H</kbd></td><td>Añadir un zoom / un resaltado en el cabezal</td></tr>
+          <tr><td><kbd>X</kbd></td><td>Dividir el bloque seleccionado (o el zoom bajo el cabezal) en el cabezal</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>Z</kbd> / <kbd>Shift</kbd> + <kbd>Cmd</kbd> + <kbd>Z</kbd></td><td>Deshacer / rehacer</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>C</kbd> <kbd>V</kbd> <kbd>D</kbd></td><td>Copiar / pegar en el cabezal / duplicar</td></tr>
+          <tr><td><kbd>R</kbd></td><td>Guardar el vídeo (rebobinar, reproducir completo, guardar), o parar antes</td></tr>
+          <tr><td><kbd>I</kbd> <kbd>O</kbd></td><td>Recortar: empezar / terminar el vídeo en el cabezal</td></tr>
+          <tr><td><kbd>V</kbd></td><td>Alternar la vista de encuadre (previsualiza el zoom final mientras editas)</td></tr>
+          <tr><td><kbd>[</kbd> <kbd>]</kbd></td><td>Proporción del zoom seleccionado ±0,1, u opacidad del resaltado ±5 %</td></tr>
+          <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Mover el cabezal un fotograma (<kbd>Shift</kbd>: un segundo)</td></tr>
+          <tr><td><kbd>Delete</kbd></td><td>Eliminar el bloque seleccionado</td></tr>
+          <tr><td><kbd>=</kbd> <kbd>-</kbd> <kbd>0</kbd></td><td>Acercar / alejar la línea de tiempo / ver todo el vídeo</td></tr>
+          <tr><td>Pellizco, <kbd>Ctrl</kbd> + desplazamiento</td><td>En la línea de tiempo: la acerca o aleja. En el vídeo: cambia la proporción del zoom seleccionado</td></tr>
+          <tr><td><kbd>Alt</kbd> mientras arrastras</td><td>Desactiva el imán hacia otros bordes</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>Cerrar un menú, deseleccionar o cerrar este panel</td></tr>
+          <tr><td><kbd>?</kbd></td><td>Mostrar u ocultar este panel</td></tr>
+        </table>
+        <h3>Un zoom tiene dos ajustes</h3>
+        <p>Cuánto se acerca (la proporción, con 1.5× a 3× a un clic) y adónde mira (arrastra el punto sobre el vídeo). Cada zoom se acerca al empezar, se mantiene el tiempo que indiques y luego vuelve solo a la normalidad. Cómo entra y sale se ajusta una vez para todo el vídeo en la tarjeta Movimiento: Suave, Ágil, Elástico o Corte.</p>
+        <h3>Desplazarse de un punto a otro</h3>
+        <p>Junta dos zooms (los bordes se imantan, o divide un zoom con <kbd>X</kbd>). La vista se desliza del primer punto al segundo sin alejarse entre medias. Una pequeña marca ⇄ indica dónde se desplaza.</p>
+        <h3>Resaltados</h3>
+        <p>Haz clic en la pista Resaltado o pulsa <kbd>H</kbd>. El resto del encuadre se oscurece mientras el recuadro sigue brillante. Con un resaltado seleccionado, arrastra su recuadro o sus tiradores sobre el vídeo, o arrastra fuera de él para dibujarlo de nuevo.</p>
+        <h3>Recortar el vídeo</h3>
+        <p>Arrastra cualquiera de los extremos azules de la pista Vídeo, o pulsa <kbd>I</kbd> / <kbd>O</kbd> en el cabezal. Reproducir y Guardar vídeo solo abarcan la parte que queda. No se borra nada de tu archivo: ↺ junto al nombre de la pista lo recupera todo.</p>
+      `,
+    },
+    fr: {
+      title: "Zoom Timeline Editor (by ThinhLe)",
+      dropHint1: "Glissez-déposez une vidéo ici, ou",
+      pick: "Choisir une vidéo…",
+      dropNote: "La vidéo est lue directement depuis votre appareil : rien n’est envoyé.",
+      play: "▶ Lecture",
+      pause: "⏸ Pause",
+      startRec: "⤓ Enregistrer la vidéo",
+      stopRec: "■ Arrêter",
+      save: "⤓ Télécharger à nouveau",
+      delItem: "Supprimer",
+      laneVideo: "Vidéo",
+      trimReset_title: "Annuler le découpage et garder toute la vidéo",
+      trimHandle_title: "Faites glisser pour couper le début ou la fin de la vidéo (ou I / O à la tête de lecture)",
+      clip_title: "Votre vidéo. Faites glisser ses extrémités bleues pour couper le début ou la fin",
+      clipLabel: (a, b, full) => full ? `Vidéo · ${(b - a).toFixed(1)}s` : `Coupé : ${a.toFixed(2)} → ${b.toFixed(2)}s · ${(b - a).toFixed(1)}s`,
+      motionTitle: "Mouvement",
+      motionScope: "tous les zooms",
+      aimHint: "Faites glisser le point sur la vidéo pour choisir où regarder.",
+      applyAll: "Appliquer à tous",
+      applyAll_title: "Donner ce rapport à tous les zooms",
+      hintEditHl: "Faites glisser le cadre pour le déplacer, une poignée pour le redimensionner, ou en dehors pour le redessiner",
+      hintEmpty: "Cliquez sur la piste Zoom de la timeline pour ajouter un zoom",
+      ctxSplit: "Diviser à la tête de lecture",
+      ctxCopy: "Copier",
+      ctxDup: "Dupliquer",
+      ctxDelete: "Supprimer",
+      ctxPaste: "Coller ici",
+      ctxAddZoom: "Ajouter un zoom ici",
+      ctxAddHl: "Ajouter une mise en évidence ici",
+      ctxLevel: "Niveau de zoom",
+      ctxResetTrim: "Annuler le découpage",
+      ctxTrimIn: "Débuter la vidéo à la tête de lecture",
+      ctxTrimOut: "Terminer la vidéo à la tête de lecture",
+      aimView: "Vue de cadrage",
+      help: "? Raccourcis",
+      selectedLabel: "Sélection",
+      emptySel: "Cliquez sur un bloc de la timeline pour le modifier. Pour ajouter un zoom, cliquez sur la piste Zoom ou faites glisser dessus.",
+      fStart: "Zoom à partir de (s)",
+      fHold: "Maintenir (s)",
+      fLen: "Afficher pendant (s)",
+      fStartHl: "Début (s)",
+      holdHint: (a, b) => `Zoome à ${a.toFixed(1)}s et revient à la normale à ${b.toFixed(1)}s.`,
+      laneZoom: "Zoom",
+      laneHl: "Mise en évidence",
+      tlFit: "Ajuster",
+      tlFit_title: "Afficher toute la vidéo (0)",
+      tlIn_title: "Agrandir la timeline (=)",
+      tlOut_title: "Réduire la timeline (-)",
+      prevFrame_title: "Image précédente (←)",
+      nextFrame_title: "Image suivante (→)",
+      tlHint: "Cliquez sur la piste Zoom pour ajouter un zoom, ou faites glisser dessus · placez deux zooms bout à bout pour passer de l’un à l’autre · clic droit sur un bloc pour plus d’options · pincez pour zoomer la timeline",
+      zoomLabel: "Rapport de zoom",
+      ease_smooth: "Fluide",
+      ease_snappy: "Vif",
+      ease_spring: "Ressort",
+      ease_cut: "Coupe",
+      ease_smooth_title: "Démarre doucement, accélère, puis se pose en douceur. Le choix sûr par défaut",
+      ease_snappy_title: "Part vite d’emblée, puis se stabilise doucement sur la cible",
+      ease_spring_title: "Dépasse légèrement la cible puis revient en rebondissant",
+      ease_cut_title: "Aucune animation : entre et sort d’un coup",
+      motionPreview: "▶ Tester le mouvement",
+      motionPreview_title: "Lit le zoom sélectionné (ou le premier) pour voir le mouvement",
+      opacityLabel: "Opacité de l’assombrissement",
+      hintAimZoom: "Faites glisser le point pour choisir où regarder · pincez ou faites glisser un coin du cadre pour changer le rapport",
+      play_title: "Lecture / pause (Espace)",
+      rec_title: "Enregistrer la vidéo : retour au début, lecture complète, enregistrement du fichier (R)",
+      addSeg_title: "Ajouter un zoom à la tête de lecture (A)",
+      addHighlight_title: "Ajouter une mise en évidence à la tête de lecture (H)",
+      delItem_title: "Supprimer le zoom ou la mise en évidence sélectionné (Suppr)",
+      aimView_title: "Prévisualiser le zoom final pendant l’édition (V)",
+      help_title: "Raccourcis clavier (?)",
+      lang: 'Langue',
+      canvasBadge: (vw, vh) => `Sortie : ${vw}×${vh} (résolution source)`,
+      segBadge: (s) => `Zoom ${s.zoom.toFixed(2)}×`,
+      hlBadge: () => "Mise en évidence",
+      recFail: "Ce navigateur ne prend pas en charge l’enregistrement.",
+      lowFpsWarn: (fps) => `Seulement ~${fps} images par seconde ont été capturées, cette prise va donc saccader. Gardez cet onglet visible et au premier plan pendant l’enregistrement : les navigateurs suspendent l’affichage dans les onglets en arrière-plan.`,
+      cheatHtml: `
+        <h3>Raccourcis clavier</h3>
+        <table>
+          <tr><td>Clic sur la piste Zoom</td><td>Ajoute un zoom à cet endroit. Faites glisser sur la piste pour lui donner la durée glissée</td></tr>
+          <tr><td>Clic droit sur un bloc</td><td>Diviser, niveau de zoom, copier, dupliquer, supprimer</td></tr>
+          <tr><td><kbd>Space</kbd></td><td>Lecture / pause</td></tr>
+          <tr><td><kbd>A</kbd> / <kbd>H</kbd></td><td>Ajouter un zoom / une mise en évidence à la tête de lecture</td></tr>
+          <tr><td><kbd>X</kbd></td><td>Diviser le bloc sélectionné (ou le zoom sous la tête de lecture) à la tête de lecture</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>Z</kbd> / <kbd>Shift</kbd> + <kbd>Cmd</kbd> + <kbd>Z</kbd></td><td>Annuler / rétablir</td></tr>
+          <tr><td><kbd>Cmd</kbd> + <kbd>C</kbd> <kbd>V</kbd> <kbd>D</kbd></td><td>Copier / coller à la tête de lecture / dupliquer</td></tr>
+          <tr><td><kbd>R</kbd></td><td>Enregistrer la vidéo (retour au début, lecture complète, enregistrement), ou arrêter plus tôt</td></tr>
+          <tr><td><kbd>I</kbd> <kbd>O</kbd></td><td>Couper : débuter / terminer la vidéo à la tête de lecture</td></tr>
+          <tr><td><kbd>V</kbd></td><td>Activer la vue de cadrage (prévisualise le zoom final pendant l’édition)</td></tr>
+          <tr><td><kbd>[</kbd> <kbd>]</kbd></td><td>Rapport du zoom sélectionné ±0,1, ou opacité de la mise en évidence ±5 %</td></tr>
+          <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Déplacer la tête de lecture d’une image (<kbd>Shift</kbd> : une seconde)</td></tr>
+          <tr><td><kbd>Delete</kbd></td><td>Supprimer le bloc sélectionné</td></tr>
+          <tr><td><kbd>=</kbd> <kbd>-</kbd> <kbd>0</kbd></td><td>Agrandir / réduire la timeline / afficher toute la vidéo</td></tr>
+          <tr><td>Pincer, <kbd>Ctrl</kbd> + défilement</td><td>Sur la timeline : la zoomer. Sur la vidéo : changer le rapport du zoom sélectionné</td></tr>
+          <tr><td><kbd>Alt</kbd> en faisant glisser</td><td>Désactive l’aimantation aux autres bords</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>Fermer un menu, désélectionner ou fermer ce panneau</td></tr>
+          <tr><td><kbd>?</kbd></td><td>Afficher ou masquer ce panneau</td></tr>
+        </table>
+        <h3>Un zoom a deux réglages</h3>
+        <p>Jusqu’où il zoome (le rapport, de 1.5× à 3× en un clic) et où il regarde (faites glisser le point sur la vidéo). Chaque zoom s’approche à son début, reste le temps indiqué, puis revient tout seul à la normale. La façon d’entrer et de sortir se règle une fois pour toute la vidéo dans la carte Mouvement : Fluide, Vif, Ressort ou Coupe.</p>
+        <h3>Passer d’un endroit à un autre</h3>
+        <p>Placez deux zooms bout à bout (les bords s’aimantent, ou divisez un zoom avec <kbd>X</kbd>). La vue glisse alors du premier point au second sans dézoomer entre les deux. Une petite marque ⇄ indique où elle se déplace.</p>
+        <h3>Mises en évidence</h3>
+        <p>Cliquez sur la piste Mise en évidence ou appuyez sur <kbd>H</kbd>. Le reste de l’image s’assombrit tandis que le cadre reste lumineux. Une mise en évidence étant sélectionnée, faites glisser son cadre ou ses poignées sur la vidéo, ou faites glisser en dehors pour le redessiner.</p>
+        <h3>Couper la vidéo</h3>
+        <p>Faites glisser l’une des extrémités bleues de la piste Vidéo, ou appuyez sur <kbd>I</kbd> / <kbd>O</kbd> à la tête de lecture. La lecture et l’enregistrement de la vidéo ne couvrent alors que la partie conservée. Rien n’est supprimé de votre fichier : ↺ à côté du nom de la piste rétablit tout.</p>
+      `,
+    },
   };
+  const LANGS = [['en', 'English'], ['vi', 'Tiếng Việt'], ['zh', '中文（简体）'], ['th', 'ไทย'], ['ja', '日本語'], ['es', 'Español'], ['fr', 'Français']];
   let lang = 'en';
   const t = (k) => STR[lang][k];
 
@@ -2591,6 +3156,7 @@
       if (STR[lang][key] !== undefined) el.title = STR[lang][key];
     });
     langBtn.textContent = t('lang');
+    langMenu.querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', b.dataset.lang === lang ? 'true' : 'false'));
     playBtn.textContent = video.paused ? t('play') : t('pause');
     if (video.videoWidth) resBadge.textContent = t('canvasBadge')(video.videoWidth, video.videoHeight);
     cheatBody.innerHTML = t('cheatHtml');
@@ -2601,12 +3167,25 @@
     try { localStorage.setItem('ztl.lang', lang); } catch (_) { /* private mode */ }
   }
 
-  langBtn.addEventListener('click', () => {
-    lang = lang === 'en' ? 'vi' : 'en';
-    applyLang();
+  const langMenu = document.getElementById('langMenu');
+  LANGS.forEach(([code, name]) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.dataset.lang = code; b.textContent = name; b.setAttribute('role', 'option');
+    b.addEventListener('click', () => { lang = code; closeLangMenu(); applyLang(); });
+    langMenu.appendChild(b);
   });
+  function closeLangMenu() { langMenu.hidden = true; langBtn.setAttribute('aria-expanded', 'false'); }
+  langBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    langMenu.hidden = !langMenu.hidden;
+    langBtn.setAttribute('aria-expanded', String(!langMenu.hidden));
+  });
+  document.addEventListener('click', (e) => { if (!langMenu.hidden && !langMenu.contains(e.target)) closeLangMenu(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !langMenu.hidden) { closeLangMenu(); langBtn.focus(); } }, true);
 
+  // English is the default; fall back to it if the saved language is unknown
   try { lang = localStorage.getItem('ztl.lang') || 'en'; } catch (_) { lang = 'en'; }
+  if (!STR[lang]) lang = 'en';
   applyLang();
   window.addEventListener('resize', resizeCanvasToStage);
   window.addEventListener('keydown', onKeyDown);

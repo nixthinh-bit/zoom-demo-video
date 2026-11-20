@@ -37,7 +37,7 @@ You want a quick zoom-in / zoom-out effect on parts of a video — a specific po
 - **Smooth motion** — zoom is interpolated at display refresh rate with an easing curve that has zero velocity *and* zero acceleration at both ends of each ramp, so there's no stutter or "kick" at the edges.
 - **Responsive canvas** — the preview sizes itself to the video's own aspect ratio, not a fixed pixel size.
 - **One-click Save video** — rewinds to the start, plays, captures the canvas at the video's native resolution, stops automatically at the end, and saves the file (MP4 H.264/AAC where supported, WebM otherwise). It also measures the actual capture rate and warns you if the tab was backgrounded and the take stuttered.
-- **English / Vietnamese toggle** — top-right corner, defaults to English, remembered between visits.
+- **Seven languages** — the **Language** button in the top-right corner switches between English, Tiếng Việt, 中文, ไทย, 日本語, Español and Français. Defaults to English, remembered between visits.
 - **100% local** — the video is read via `URL.createObjectURL`; nothing is ever uploaded anywhere.
 
 ## Usage
