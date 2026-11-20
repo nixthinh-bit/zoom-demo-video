@@ -8,6 +8,8 @@ A single-file, browser-based tool for adding zoom-in / zoom-out effects to a vid
 
 ## Demo
 
+![Zoom Timeline Editor in the Nắng Chanh chibi theme](docs/screenshot.png)
+
 https://github.com/user-attachments/assets/cbaa0d2c-6cca-428b-8ed2-0e9e0cc66167
 
 *Recorded with the tool itself, zooming into a chat reply for emphasis. The content on screen (chat messages, a "7-11 Holiday Campaign" doc) is placeholder/example material used for demos and practice — it is not real data and is not related to any real company.*

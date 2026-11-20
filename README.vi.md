@@ -8,6 +8,8 @@ Công cụ thêm hiệu ứng zoom in / zoom out cho video, chạy gọn trong m
 
 ## Demo
 
+![Zoom Timeline Editor với giao diện chibi Nắng Chanh](docs/screenshot.png)
+
 https://github.com/user-attachments/assets/cbaa0d2c-6cca-428b-8ed2-0e9e0cc66167
 
 *Quay bằng chính công cụ này, zoom vào một tin nhắn trả lời để nhấn mạnh. Nội dung xuất hiện trong video (tin nhắn chat, tài liệu "7-11 Holiday Campaign") là dữ liệu ví dụ/demo dùng để luyện tập, không phải dữ liệu thật và không liên quan đến bất kỳ công ty nào.*
