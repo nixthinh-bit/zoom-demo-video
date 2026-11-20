@@ -4,23 +4,36 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Zoom Timeline Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap">
 <style>
   :root {
-    color-scheme: dark;
-    --bg: #0e1013;
-    --panel: #171a1f;
-    --panel-2: #20242b;
-    --panel-3: #2a2f37;
-    --border: #2b3037;
-    --text: #e8e9ec;
-    --muted: #8a919c;
-    --accent: #4da3ff;
-    --accent-2: #ff6b6b;
-    --seg: #ffd166;
-    --seg-fill: rgba(255, 209, 102, 0.14);
-    --hl: #7ee081;
-    --hl-fill: rgba(126, 224, 129, 0.14);
-    --radius: 14px;
+    color-scheme: light;
+    /* Zoom Chibi / Nắng Chanh tokens */
+    --bg: #fff6d1;
+    --panel: #ffffff;
+    --panel-2: #ffeaa0;
+    --panel-3: #ffdf70;
+    --border: #3b2a1a;
+    --text: #3b2a1a;
+    --muted: #6b4f2f;
+    --accent: #ffa63d;
+    --accent-2: #ff7070;
+    --seg: #ffe066;
+    --seg-fill: #ffe066;
+    --hl: #7be495;
+    --hl-fill: #7be495;
+    --video: #5bc8f5;
+    --on-color: #3b2a1a;
+    --focus-ring: #2448e0;
+    --radius: 24px;
+    --shadow-card: 0 0 0 2.5px #3b2a1a, 5px 6px 0 2.5px #3b2a1a;
+    --shadow-pop: 0 0 0 2.5px #3b2a1a, 3px 4px 0 2.5px #3b2a1a;
+    --shadow-press: 0 0 0 2.5px #3b2a1a;
+    --shadow-chip: 0 0 0 2px #3b2a1a;
+    --font-display: "Baloo 2", "Nunito", system-ui, sans-serif;
+    --font-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
@@ -354,6 +367,99 @@
     border-bottom-width: 2px; border-radius: 4px; padding: 1px 5px; font: inherit; font-size: 11px;
   }
   .cheatsheet p { color: var(--muted); font-size: 12px; line-height: 1.5; margin: 0 0 4px; }
+  /* ===== Zoom Chibi: Nắng Chanh skin (sticker outlines, hard shadows, pill shapes) ===== */
+  html, body { font: 600 14px/1.4 var(--font-body); }
+  .topbar h1 { font: 700 22px/1 var(--font-display); }
+  .logo { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: var(--on-color); box-shadow: var(--shadow-pop); font-size: 16px; }
+  button {
+    background: var(--panel); color: var(--text); border: 0; border-radius: 999px;
+    min-height: 40px; padding: 0 16px; font-weight: 800; box-shadow: var(--shadow-pop);
+    transition: transform .16s var(--bounce), box-shadow .16s var(--bounce);
+  }
+  button:hover:not(:disabled) { background: var(--panel); transform: translateY(-2px); }
+  button:active:not(:disabled) { transform: translateY(3px); box-shadow: var(--shadow-press); }
+  button:disabled { opacity: .5; box-shadow: none; }
+  button.danger { color: #a12020; }
+  button.ghost { background: transparent; box-shadow: none; }
+  button.ghost:hover:not(:disabled) { background: var(--panel-2); transform: none; }
+  button.icon { min-height: 36px; }
+  button.rec { background: var(--accent-2); color: var(--on-color); }
+  button.rec:hover:not(:disabled) { background: #ff8a8a; }
+  button.rec.recording { background: #fff; color: #b3261e; }
+  button.play { background: var(--accent); color: var(--on-color); }
+  button.play:hover:not(:disabled) { background: #ffb85c; }
+  button.tool-btn.active { background: var(--accent); color: var(--on-color); }
+  button kbd, .kbd { background: var(--panel-2); color: var(--text); border-color: var(--border); }
+  button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
+  input[type=number] { background: var(--panel); border: 2.5px solid var(--border); border-radius: 16px; min-height: 38px; }
+  a.saveLink { background: var(--panel); color: var(--text); border: 2.5px solid var(--border); border-radius: 999px; font-weight: 800; }
+  .card { border: 0; border-radius: var(--radius); box-shadow: var(--shadow-card); padding: 16px; }
+  .card-title { font: 800 12px/16px var(--font-body); letter-spacing: .04em; color: var(--muted); }
+  .badge, .chip { background: var(--panel-2); border: 0; color: var(--text); font-weight: 800; }
+  .hint, .field, .fields3 label, .ctl label, .sublabel { color: var(--muted); font-weight: 700; }
+  .stage-card { background: var(--panel-2); }
+  .stage { border-radius: 16px; box-shadow: 0 0 0 2.5px var(--border); }
+  .stage.drag-over { outline: 3px dashed var(--focus-ring); }
+  .dropHint { color: #ffeaa0; font-weight: 700; }
+  .dropHint .pick { background: var(--accent); color: var(--on-color); border: 0; min-height: 44px; padding: 0 22px; }
+  .recDot, .canvasHint { background: rgba(255,255,255,.92); color: var(--text); font-weight: 800; box-shadow: 0 0 0 2px var(--border); }
+  .presets button { min-height: 34px; padding: 0; }
+  .presets button.on { background: var(--accent); color: var(--on-color); border: 0; }
+  .empty { border: 2.5px dashed var(--border); border-radius: 16px; }
+  .motion-opt { border: 0; border-radius: 16px; background: var(--panel-2); color: var(--text); box-shadow: var(--shadow-chip); font-weight: 800; }
+  .motion-opt:hover { background: var(--panel-3); }
+  .motion-opt:has(input:checked) { background: var(--accent); color: var(--on-color); box-shadow: var(--shadow-pop); }
+  .motion-opt:has(input:checked) .curve { color: var(--on-color); }
+  .motion-opt:has(input:focus-visible) { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
+  .motion-opt input:checked ~ .tk { background: var(--panel); border-color: var(--border); color: var(--text); }
+  .tl-wrap { border: 0; border-radius: var(--radius); background: var(--panel-2); box-shadow: inset 0 0 0 2.5px var(--border); }
+  .lane-labels { background: var(--panel); border-right: 2.5px solid var(--border); }
+  .ll { color: var(--text); font-weight: 800; }
+  .ll.ruler-sp, .ll.video, .ll.zoom { border-bottom: 2.5px solid var(--border); }
+  .ll-btn { color: var(--text); font-weight: 800; box-shadow: none; border-radius: 0; min-height: 0; }
+  .ll-btn:hover:not(:disabled) { transform: none; background: var(--panel-2); }
+  .ll.video button { min-height: 0; padding: 2px 8px; box-shadow: none; }
+  .ll i { border-radius: 50%; width: 10px; height: 10px; box-shadow: 0 0 0 2px var(--border); }
+  .ll.video i { background: var(--video); }
+  .timeline::before, .timeline::after { height: 2px; background: rgba(59,42,26,.25); }
+  .ruler { background: var(--panel); border-bottom: 2.5px solid var(--border); }
+  .tick { background: #a58a63; }
+  .tick.major { background: var(--text); }
+  .tick span { color: var(--muted); font-weight: 800; }
+  .clip {
+    background: var(--video); border: 2.5px solid var(--border); border-radius: 999px;
+    color: var(--on-color); font-weight: 800; top: 27px; height: 26px;
+  }
+  .lane-ghost { border: 2px dashed var(--border); background: rgba(255,224,102,.4); color: var(--text); border-radius: 999px; }
+  .lane-ghost.hl { border-color: var(--border); background: rgba(123,228,149,.4); color: var(--text); }
+  .lane-ghost.pending { border-style: solid; background: var(--seg); }
+  .lane-ghost.hl.pending { background: var(--hl); }
+  .seam { top: 64px; width: 20px; height: 20px; margin-left: -10px; border-radius: 50%; background: var(--panel); color: var(--text); box-shadow: 0 0 0 2px var(--border); line-height: 20px; }
+  .playhead { background: var(--text); width: 4px; margin-left: -2px; }
+  .playhead::before { left: -4px; border-top-color: var(--text); }
+  .seg-fill { background: var(--seg); border: 2.5px solid var(--border); border-radius: 999px; }
+  .seg-fill polygon { fill: rgba(255,166,61,.6); }
+  .seg-label { color: var(--on-color); text-shadow: none; font-weight: 800; }
+  .segment.selected .seg-fill { border-color: var(--text); box-shadow: 0 0 0 3px var(--focus-ring); }
+  .segment.selected polygon { fill: rgba(36,72,224,.3); }
+  .segment.highlight .seg-fill { background: var(--hl); border-color: var(--border); }
+  .segment.highlight.selected .seg-fill { background: var(--hl); border-color: var(--text); box-shadow: 0 0 0 3px var(--focus-ring); }
+  .seg-handle::after { background: var(--text); }
+  .trim-shade { background: rgba(255,246,209,.75); }
+  .trim-handle { background: var(--video); border: 2.5px solid var(--border); top: 26px; height: 28px; }
+  .trim-handle::after { background: var(--text); left: 2px; }
+  .trim-handle.active { background: #9adcf7; }
+  .ctxmenu { background: var(--panel); border: 2.5px solid var(--border); border-radius: 16px; box-shadow: 4px 5px 0 var(--border); }
+  .ctxmenu button { background: transparent; box-shadow: none; min-height: 0; padding: 7px 10px; border-radius: 10px; font-weight: 700; }
+  .ctxmenu button:hover:not(:disabled) { background: var(--panel-2); transform: none; }
+  .ctxmenu button.danger:hover { background: rgba(255,112,112,.25); }
+  .ctxmenu .sep { background: rgba(59,42,26,.25); }
+  .ctxmenu .row button { background: var(--panel-2); }
+  .cheatsheet { background: rgba(59,42,26,.45); }
+  .cheatsheet-card { border: 0; border-radius: var(--radius); box-shadow: var(--shadow-card); }
+  .cheatsheet kbd { background: var(--panel-2); border-color: var(--border); }
+  .cheatsheet-close { min-height: 32px; padding: 0 12px; }
+  @media (prefers-reduced-motion: reduce) { button { transition: none; } }
 </style>
 </head>
 <body>
@@ -963,12 +1069,12 @@
       const box = aimBoxRectCanvas(s);
       if (box) {
         c.save();
-        c.strokeStyle = 'rgba(77,163,255,0.95)';
+        c.strokeStyle = 'rgba(91,200,245,0.95)';
         c.lineWidth = 2 * dpr;
         c.setLineDash([6 * dpr, 4 * dpr]);
         c.strokeRect(box.x, box.y, box.w, box.h);
         c.setLineDash([]);
-        c.fillStyle = 'rgba(77,163,255,0.95)';
+        c.fillStyle = 'rgba(91,200,245,0.95)';
         const hs = 5 * dpr;
         for (const [cx, cy] of [
           [box.x, box.y], [box.x + box.w, box.y],
@@ -984,9 +1090,9 @@
       const r = 10 * dpr;
       c.save();
       c.beginPath(); c.arc(ret.x, ret.y, r + 3 * dpr, 0, Math.PI * 2);
-      c.fillStyle = 'rgba(77,163,255,0.25)'; c.fill();
+      c.fillStyle = 'rgba(91,200,245,0.25)'; c.fill();
       c.beginPath(); c.arc(ret.x, ret.y, r, 0, Math.PI * 2);
-      c.fillStyle = 'rgba(77,163,255,0.95)'; c.fill();
+      c.fillStyle = 'rgba(91,200,245,0.95)'; c.fill();
       c.lineWidth = 2.5 * dpr; c.strokeStyle = '#fff'; c.stroke();
       c.beginPath(); c.arc(ret.x, ret.y, 3 * dpr, 0, Math.PI * 2);
       c.fillStyle = '#fff'; c.fill();
